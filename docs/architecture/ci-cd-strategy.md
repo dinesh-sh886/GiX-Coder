@@ -262,3 +262,32 @@ jobs:
 | Test flakiness | < 1% |
 | False positive security | < 5% |
 | Mean time to feedback | < 10 min |
+
+---
+
+## References
+
+- [Git Branching Strategy](git-strategy.md)
+- [PR Strategy](pr-strategy.md)
+- [Environment Strategy](environment-strategy.md)
+- [Quality Gates](../qa/quality-gates.md)
+- [Testing Strategy](../qa/testing-strategy.md)
+- ADR-0002: Modular Monolith
+- ADR-0003: Durable Workflow Engine
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder CI/CD Strategy
+type: architecture
+phase: 00
+status: Verified
+author: Platform Lead
+date: 2024-10-07
+reviewers: Architect, Platform Lead, Security Lead
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0002, ADR-0003]
+related_issues: []
+---

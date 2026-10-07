@@ -296,3 +296,30 @@ BREAKING CHANGE: rate limit headers changed
 - Human approval
 - SBOM attestation
 - Signature verification
+
+---
+
+## References
+
+- [Engineering Principles](engineering-principles.md)
+- [Quality Gates](../qa/quality-gates.md)
+- [Testing Strategy](../qa/testing-strategy.md)
+- ADR-0001: Control Plane / Data Plane Separation
+- ADR-0002: Modular Monolith
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Coding Standards
+type: architecture
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Architect, Platform Lead, Security Lead
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0001, ADR-0002]
+related_issues: []
+---

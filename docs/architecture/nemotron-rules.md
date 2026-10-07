@@ -275,3 +275,29 @@ Approve | Request Changes | Escalate to Architect
 - Validate Nemotron reasoning
 - Document overrides with reasoning
 - Own production outcomes
+
+---
+
+## References
+
+- [OpenCode Rules](opencode-rules.md)
+- [Phase Lifecycle](phase-lifecycle.md)
+- [Engineering Principles](engineering-principles.md)
+- ADR-0002: Modular Monolith
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Nemotron Decision-Making Rules
+type: architecture
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Architect, Platform Lead
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0002]
+related_issues: []
+---

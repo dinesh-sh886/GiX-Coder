@@ -307,3 +307,30 @@ wf := WorkflowBuilder().WithName("custom").Build()
 | Commented-out tests | Dead code, false confidence |
 | `t.Skip()` without reason | Hidden gaps |
 | Assertions without messages | Hard to debug |
+
+---
+
+## References
+
+- [Quality Gates](quality-gates.md)
+- [CI/CD Strategy](../architecture/ci-cd-strategy.md)
+- [Engineering Principles](../architecture/engineering-principles.md)
+- ADR-0002: Modular Monolith
+- ADR-0003: Durable Workflow Engine
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Testing Strategy
+type: qa
+phase: 00
+status: Verified
+author: QA Lead
+date: 2024-10-07
+reviewers: QA Lead, Architect, Platform Lead
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0002, ADR-0003]
+related_issues: []
+---

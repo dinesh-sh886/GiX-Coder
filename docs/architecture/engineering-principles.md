@@ -135,3 +135,30 @@ When principles conflict:
 5. **Standards** > Preferences
 
 Document tradeoffs in ADRs.
+
+---
+
+## References
+
+- [Architecture Baseline](baseline.md)
+- [Repository Structure](repository-structure.md)
+- [Coding Standards](coding-standards.md)
+- ADR-0001: Control Plane / Data Plane Separation
+- ADR-0002: Modular Monolith
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Engineering Principles
+type: architecture
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Architect, Platform Lead, Security Lead
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0001, ADR-0002]
+related_issues: []
+---

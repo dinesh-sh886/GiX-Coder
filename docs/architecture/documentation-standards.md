@@ -284,3 +284,29 @@ graph TD
 | Missing metadata | No ownership, no audit trail |
 | Duplicate content | Inconsistency, maintenance burden |
 | Generated docs not reviewed | Errors propagate |
+
+---
+
+## References
+
+- [Engineering Principles](engineering-principles.md)
+- [Architecture Baseline](baseline.md)
+- [ADR Framework](../adr/framework.md)
+- ADR-0002: Modular Monolith
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Documentation Standards
+type: architecture
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Architect, Platform Lead
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0002]
+related_issues: []
+---

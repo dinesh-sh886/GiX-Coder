@@ -182,3 +182,29 @@ allow_force_pushes: false
 - Production approval triggers `main` merge
 - `main` merge triggers production deploy
 - Rollback = revert merge commit on `main`
+
+---
+
+## References
+
+- [Engineering Principles](engineering-principles.md)
+- [PR Strategy](pr-strategy.md)
+- [CI/CD Strategy](ci-cd-strategy.md)
+- ADR-0002: Modular Monolith
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Git Branching Strategy
+type: architecture
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Platform Lead, Architect
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0002]
+related_issues: []
+---

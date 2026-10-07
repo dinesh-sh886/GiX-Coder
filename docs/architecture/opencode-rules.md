@@ -309,3 +309,29 @@ Human approval required for:
 | Suppressing gate failures | Non-negotiable |
 | Human not in loop for production | Authority |
 | Implementation without ADR | Documentation first |
+
+---
+
+## References
+
+- [Engineering Principles](engineering-principles.md)
+- [Phase Lifecycle](phase-lifecycle.md)
+- [Nemotron Rules](nemotron-rules.md)
+- ADR-0002: Modular Monolith
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder OpenCode Operating Rules
+type: architecture
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Architect, Platform Lead
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0002]
+related_issues: []
+---

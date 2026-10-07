@@ -72,3 +72,29 @@ Provide a production-grade, secure, and auditable platform for AI-assisted softw
 - Replacing human engineering judgment
 - Executing untrusted code in control plane
 - Premature microservice decomposition
+
+---
+
+## References
+
+- [Architecture Baseline](../architecture/baseline.md)
+- [Phase 01 Specification](../phases/phase-01/specification.md)
+- ADR-0001: Control Plane / Data Plane Separation
+- ADR-0002: Modular Monolith
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Product Charter
+type: product
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Product Owner, Architect, Security Lead
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0001, ADR-0002]
+related_issues: []
+---

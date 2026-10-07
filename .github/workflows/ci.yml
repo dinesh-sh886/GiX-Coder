@@ -95,7 +95,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     needs: validate
     services:
       postgres:
@@ -155,6 +155,9 @@ jobs:
 
       - name: Run Architecture Tests
         run: make test-architecture
+
+      - name: Race Detection
+        run: make race-detection
 
       - name: Upload Coverage (Go)
         uses: codecov/codecov-action@v4
@@ -226,7 +229,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     needs: [validate, test, security]
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     outputs:
@@ -281,6 +284,21 @@ jobs:
 
       - name: Verify Build Reproducibility
         run: make verify-reproducible-build
+
+      - name: Protobuf Compatibility Check
+        run: make protobuf-compat
+
+      - name: API Compatibility Check
+        run: make api-compat
+
+      - name: API Documentation Check
+        run: make api-docs-check
+
+      - name: README Check
+        run: make readme-check
+
+      - name: Changelog Check
+        run: make changelog-check
 
   # =============================================================================
   # DEPLOY DEV (Auto on develop merge)

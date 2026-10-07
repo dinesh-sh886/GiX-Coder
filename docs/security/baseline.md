@@ -161,3 +161,31 @@ Isolation Layers:
 - Incident response (on-call)
 - Supply chain security (platform team)
 - New hire security orientation
+
+---
+
+## References
+
+- [Architecture Baseline](../architecture/baseline.md)
+- [Environment Strategy](../architecture/environment-strategy.md)
+- [Configuration Strategy](../architecture/configuration-strategy.md)
+- [Observability Strategy](../architecture/observability-strategy.md)
+- ADR-0001: Control Plane / Data Plane Separation
+- ADR-0004: Sandbox Isolation
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Security Baseline
+type: security
+phase: 00
+status: Verified
+author: Security Lead
+date: 2024-10-07
+reviewers: Architect, Platform Lead, Security Lead
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0001, ADR-0004]
+related_issues: []
+---

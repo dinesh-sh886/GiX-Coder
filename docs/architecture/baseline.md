@@ -214,3 +214,32 @@ Phase 03: CLI/IDE/Web/API Interfaces
 Phase 04: Multi-tenancy + RBAC + Compliance
 Future:   Service extraction where justified by scale/team boundaries
 ```
+
+---
+
+## References
+
+- [Product Charter](../product/charter.md)
+- [Repository Structure](repository-structure.md)
+- [Engineering Principles](engineering-principles.md)
+- ADR-0001: Control Plane / Data Plane Separation
+- ADR-0002: Modular Monolith
+- ADR-0003: Durable Workflow Engine
+- ADR-0004: Sandbox Isolation
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder System Architecture Baseline
+type: architecture
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Platform Lead, Security Lead, Product Owner
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0001, ADR-0002, ADR-0003, ADR-0004]
+related_issues: []
+---

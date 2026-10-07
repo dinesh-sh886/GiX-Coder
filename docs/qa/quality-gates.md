@@ -83,6 +83,17 @@ Quality gates are **non-negotiable** minimum standards. They are not targets to 
 | ADR for Architecture | Significant decisions | Required |
 | Changelog | Per release | Required |
 
+---
+
+## References
+
+- [Testing Strategy](testing-strategy.md)
+- [CI/CD Strategy](../architecture/ci-cd-strategy.md)
+- [Engineering Principles](../architecture/engineering-principles.md)
+- [Coding Standards](../architecture/coding-standards.md)
+- ADR-0002: Modular Monolith
+- ADR-0003: Durable Workflow Engine
+
 ## Gate Enforcement Points
 
 ### Pre-commit (Local, Fast)
@@ -200,3 +211,20 @@ Before marking PR ready:
 - [ ] Documentation updated
 - [ ] ADR created (if architectural)
 - [ ] Changelog entry added
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Quality Gates
+type: qa
+phase: 00
+status: Verified
+author: QA Lead
+date: 2024-10-07
+reviewers: QA Lead, Architect, Platform Lead, Security Lead
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0002, ADR-0003]
+related_issues: []
+---

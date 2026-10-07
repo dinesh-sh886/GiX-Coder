@@ -343,3 +343,28 @@ func LoadConfig() (*Config, error) {
 | No defaults | Fragile, unclear | Sensible defaults in code |
 | Secrets in env vars (prod) | Leakage in logs/process list | Secret manager injection |
 | Feature flags as config | No rollout control | Dedicated flag system |
+
+---
+
+## References
+
+- [Environment Strategy](environment-strategy.md)
+- [Security Baseline](../security/baseline.md)
+- ADR-0001: Control Plane / Data Plane Separation
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Configuration Strategy
+type: architecture
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Platform Lead, Security Lead, Architect
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0001]
+related_issues: []
+---

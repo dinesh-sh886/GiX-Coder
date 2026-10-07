@@ -256,3 +256,30 @@ Every phase completes with retrospective:
 | Gates weakened to pass | Technical debt accumulation |
 | Phase declared complete without PROD | False completion |
 | No retrospective | Repeated mistakes |
+
+---
+
+## References
+
+- [OpenCode Rules](opencode-rules.md)
+- [Nemotron Rules](nemotron-rules.md)
+- [Engineering Principles](engineering-principles.md)
+- [Quality Gates](../qa/quality-gates.md)
+- ADR-0002: Modular Monolith
+
+---
+
+## Metadata
+
+---
+title: GiX-Coder Phase Lifecycle
+type: architecture
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Architect, Platform Lead, Release Manager
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0002]
+related_issues: []
+---
