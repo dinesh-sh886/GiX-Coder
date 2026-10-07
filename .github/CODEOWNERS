@@ -1,0 +1,65 @@
+# GiX-Coder CODEOWNERS
+# These users/groups will be requested for review on matching files
+
+# Global owners (required for all PRs to main)
+* @dinesh-sh886 @gix-architects
+
+# Documentation
+docs/ @gix-docs
+
+# Architecture & Governance
+docs/architecture/ @gix-architects
+docs/adr/ @gix-architects
+docs/security/ @gix-security
+docs/qa/ @gix-qa
+
+# Phase artifacts
+docs/phases/ @gix-architects @gix-product
+
+# GitHub configuration
+.github/ @gix-platform
+
+# Root configuration
+README.md @gix-docs
+CONTRIBUTING.md @gix-docs
+SECURITY.md @gix-security
+LICENSE @dinesh-sh886
+Makefile @gix-platform
+go.work @gix-platform
+
+# Gateway module
+gateway/ @gix-gateway-team
+
+# Workflow module
+workflow/ @gix-workflow-team
+
+# Harness module
+harness/ @gix-harness-team
+
+# Sandbox module
+sandbox/ @gix-sandbox-team
+
+# Router module
+router/ @gix-router-team
+
+# Policy module
+policy/ @gix-policy-team
+
+# Audit module
+audit/ @gix-audit-team
+
+# Shared kernel
+shared/ @gix-platform
+
+# API definitions
+api/ @gix-platform @gix-architects
+
+# Deployment
+deploy/ @gix-platform
+
+# Test infrastructure
+test/ @gix-qa
+
+# Scripts & Tools
+scripts/ @gix-platform
+tools/ @gix-platform

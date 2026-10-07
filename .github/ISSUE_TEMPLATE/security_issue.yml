@@ -1,0 +1,42 @@
+---
+name: Security Issue
+description: Report a security vulnerability (use private disclosure for sensitive issues)
+title: "[SECURITY] "
+labels: ["security"]
+assignees: []
+---
+## Security Issue
+
+> **⚠️ For sensitive vulnerabilities, please use [GitHub Security Advisories](https://github.com/dinesh-sh886/GiX-Coder/security/advisories/new) instead of this public template.**
+
+### Summary
+Brief description (no exploit details in public issue)
+
+### Affected Components
+- [ ] Gateway
+- [ ] Workflow Engine
+- [ ] Harness
+- [ ] Sandbox
+- [ ] Router
+- [ ] Policy
+- [ ] Audit
+- [ ] Shared
+- [ ] Infrastructure
+
+### Severity (CVSS if known)
+- [ ] Critical
+- [ ] High
+- [ ] Medium
+- [ ] Low
+
+### Impact
+What could an attacker achieve?
+
+### Reproduction (if safe to share)
+Steps to reproduce (sanitized)
+
+### Suggested Fix
+If you have ideas
+
+### Reporter Contact
+How to reach you for coordination

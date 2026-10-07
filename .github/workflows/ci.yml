@@ -1,0 +1,396 @@
+# GiX-Coder GitHub Actions Workflows
+
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+      - stage
+      - main
+      - 'feature/**'
+      - 'fix/**'
+      - 'refactor/**'
+      - 'chore/**'
+      - 'docs/**'
+      - 'test/**'
+      - 'security/**'
+  pull_request:
+    branches:
+      - develop
+      - stage
+      - main
+  schedule:
+    # Nightly full test suite
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+env:
+  GO_VERSION: '1.22'
+  NODE_VERSION: '20'
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # =============================================================================
+  # VALIDATE (Fast - < 5 min)
+  # =============================================================================
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Tools
+        run: make install-tools
+
+      - name: Format Check (Go)
+        run: make fmt-check
+
+      - name: Format Check (TypeScript)
+        run: make fmt-check-ts
+
+      - name: Lint (Go)
+        run: make lint-go
+
+      - name: Lint (TypeScript)
+        run: make lint-ts
+
+      - name: Type Check (Go)
+        run: make typecheck-go
+
+      - name: Type Check (TypeScript)
+        run: make typecheck-ts
+
+      - name: Generate Code
+        run: make generate
+
+      - name: Verify Generated Code Committed
+        run: |
+          if ! git diff --quiet; then
+            echo "Generated code not committed"
+            git diff --stat
+            exit 1
+          fi
+
+  # =============================================================================
+  # TEST (Medium - < 15 min)
+  # =============================================================================
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: validate
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: gix_coder
+          POSTGRES_USER: gix_coder
+          POSTGRES_PASSWORD: test
+        ports: 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U gix_coder"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      redis:
+        image: redis:7-alpine
+        ports: 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
+      temporal:
+        image: temporalio/auto-setup:1.22
+        ports: 7233:7233
+        env:
+          DB: postgresql
+          DB_PORT: 5432
+          POSTGRES_USER: gix_coder
+          POSTGRES_PWD: test
+          POSTGRES_DB: gix_coder
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Run Unit Tests (Go)
+        run: make test-unit-go
+
+      - name: Run Unit Tests (TypeScript)
+        run: make test-unit-ts
+
+      - name: Run Integration Tests
+        run: make test-integration
+
+      - name: Run Contract Tests
+        run: make test-contract
+
+      - name: Run Architecture Tests
+        run: make test-architecture
+
+      - name: Upload Coverage (Go)
+        uses: codecov/codecov-action@v4
+        with:
+          flags: go
+          files: ./coverage/go.out
+
+      - name: Upload Coverage (TypeScript)
+        uses: codecov/codecov-action@v4
+        with:
+          flags: typescript
+          files: ./coverage/ts.out
+
+  # =============================================================================
+  # SECURITY (Medium - < 10 min)
+  # =============================================================================
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: validate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Secret Scan
+        uses: trufflesecurity/trufflehog@v3
+        with:
+          path: ./
+          base: ${{ github.event.pull_request.base.sha || github.sha }}
+          head: ${{ github.event.pull_request.head.sha || github.sha }}
+          extra_args: --no-verification --fail
+
+      - name: Dependency Scan (Go)
+        run: make security-scan-go
+
+      - name: Dependency Scan (TypeScript)
+        run: make security-scan-ts
+
+      - name: License Check
+        run: make license-check
+
+      - name: SAST (CodeQL)
+        uses: github/codeql-action/analyze@v3
+        with:
+          languages: go,typescript
+          queries: security-extended,security-and-quality
+
+      - name: Container Scan
+        run: make container-scan
+
+  # =============================================================================
+  # BUILD (Medium - < 10 min)
+  # =============================================================================
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [validate, test, security]
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ github.ref_name }}
+            org.opencontainers.image.created=${{ github.event.repository.created_at }}
+
+      - name: Build and Push (Multi-arch)
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
+
+      - name: Verify Build Reproducibility
+        run: make verify-reproducible-build
+
+  # =============================================================================
+  # DEPLOY DEV (Auto on develop merge)
+  # =============================================================================
+  deploy-dev:
+    name: Deploy DEV
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment: dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to DEV
+        run: make deploy-dev
+
+      - name: Smoke Tests
+        run: make smoke-test-dev
+
+  # =============================================================================
+  # DEPLOY STAGE (Manual on stage branch)
+  # =============================================================================
+  deploy-stage:
+    name: Deploy STAGE
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: build
+    if: github.ref == 'refs/heads/stage'
+    environment: stage
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to STAGE
+        run: make deploy-stage
+
+      - name: Full Test Suite
+        run: make test-e2e-stage
+
+      - name: Performance Baseline
+        run: make perf-test-stage
+
+  # =============================================================================
+  # DEPLOY PROD (Manual on tag)
+  # =============================================================================
+  deploy-prod:
+    name: Deploy PROD
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    environment: prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Image Signature
+        run: make verify-image-signature
+
+      - name: Deploy to PROD (Canary)
+        run: make deploy-prod-canary
+
+      - name: Post-Deploy Verification
+        run: make verify-prod
+
+  # =============================================================================
+  # RELEASE (On tag)
+  # =============================================================================
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: deploy-prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Release Notes
+        run: make release-notes
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*.tar.gz
+            dist/*.sbom.json
+            dist/*.sig
+
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "text": "Release ${{ github.ref_name }} deployed to PROD",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Release ${{ github.ref_name }}* deployed to PROD :rocket:"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
