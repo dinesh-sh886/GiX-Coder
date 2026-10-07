@@ -98,7 +98,7 @@ Report via **private channels**:
 - Supply chain security (SLSA, sigstore)
 
 ### Threat Model
-See [Threat Model](docs/security/threat-model.md)
+The threat model is documented in the Security Baseline (`docs/security/baseline.md`, "Attack Vectors & Mitigations" section). A standalone threat model document is planned for Phase 01+ (`docs/security/threat-model.md` — not yet created).
 
 ### Compliance Targets
 - SOC 2 Type II

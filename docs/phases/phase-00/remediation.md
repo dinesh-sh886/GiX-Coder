@@ -44,7 +44,7 @@ Original verification (by implementation agent) claimed PASS. Independent verifi
 | Added 6 missing quality gates to CI build job | `.github/workflows/ci.yml` | ✓ |
 | Added Race Detection gate to test job | `.github/workflows/ci.yml` | ✓ |
 | Rewrote repository-structure.md with Current/Planned separation | `docs/architecture/repository-structure.md` | ✓ |
-| Added metadata blocks to all 40+ governance documents | 40+ files in docs/ | ✓ |
+| Added metadata blocks to all 34 governed documents | 34 files in docs/ | ✓ |
 | Created ADR index | `docs/adr/README.md` (new) | ✓ |
 | Rewrote verification.md to reflect actual FAIL state | `docs/phases/phase-00/verification.md` | ✓ |
 | Updated remediation.md with actual remediation | `docs/phases/phase-00/remediation.md` | ✓ |
