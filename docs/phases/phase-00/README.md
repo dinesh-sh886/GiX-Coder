@@ -86,3 +86,20 @@ All Phase 00 acceptance criteria verified:
 Proceed to **Phase 01**: Agent Gateway & Execution Sandbox Foundation
 
 See [Phase 01 Specification](docs/phases/phase-01/specification.md)
+
+---
+
+## Metadata
+
+---
+title: Phase 00 Overview
+type: phase
+phase: 00
+status: Remediated - Awaiting Re-verification
+author: Planner
+date: 2024-10-07
+reviewers: Architect, Platform Lead
+approved_by: N/A - Awaiting Re-verification
+related_adrs: [ADR-0001, ADR-0002, ADR-0003, ADR-0004]
+related_issues: []
+---
