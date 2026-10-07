@@ -1,0 +1,176 @@
+syntax = "proto3";
+
+package gix.sandbox.v1;
+
+option go_package = "github.com/gix-coder/gix-coder/api/proto/gix/sandbox/v1;sandboxv1";
+
+import "api/proto/gix/shared/v1/common.proto";
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+service SandboxService {
+  rpc Execute(ExecuteRequest) returns (ExecuteResponse) {
+    option (google.api.http) = {
+      post: "/sandbox/sessions/{session_id}:execute"
+      body: "*"
+    };
+  }
+  
+  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse) {
+    option (google.api.http) = {
+      post: "/sandbox/sessions"
+      body: "*"
+    };
+  }
+  
+  rpc DestroySession(DestroySessionRequest) returns (DestroySessionResponse) {
+    option (google.api.http) = {
+      delete: "/sandbox/sessions/{session_id}"
+    };
+  }
+  
+  rpc GetSession(GetSessionRequest) returns (GetSessionResponse) {
+    option (google.api.http) = {
+      get: "/sandbox/sessions/{session_id}"
+    };
+  }
+}
+
+message ExecuteRequest {
+  string session_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string tool = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  map<string, string> arguments = 3;
+  gix.shared.v1.CapabilityGrant grant = 4;
+  ResourceLimits limits = 5;
+}
+
+message ExecuteResponse {
+  string tool = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  map<string, string> output = 2;
+  int32 exit_code = 3 [
+    (buf.validate.field).int32.gte = 0
+  ];
+  string error = 4 [
+    (buf.validate.field).string.max_len = 512
+  ];
+  int64 duration_ms = 5 [
+    (buf.validate.field).int64.gte = 0
+  ];
+  ResourceUsage resources = 6;
+}
+
+message CreateSessionRequest {
+  string execution_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  repeated gix.shared.v1.CapabilityGrant capabilities = 2;
+  ResourceLimits limits = 3;
+  string runtime = 4 [
+    (buf.validate.field).string.max_len = 64
+  ];
+}
+
+message CreateSessionResponse {
+  string session_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string status = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+}
+
+message DestroySessionRequest {
+  string session_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message DestroySessionResponse {
+  bool success = 1;
+  string message = 2 [
+    (buf.validate.field).string.max_len = 256
+  ];
+}
+
+message GetSessionRequest {
+  string session_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message GetSessionResponse {
+  SessionInfo session = 1;
+}
+
+message SessionInfo {
+  string session_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string execution_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string status = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  repeated gix.shared.v1.CapabilityGrant capabilities = 5;
+  ResourceLimits limits = 6;
+  int64 created_at = 7 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  int64 last_used_at = 8 [
+    (buf.validate.field).int64.gte = 0
+  ];
+}
+
+message ResourceLimits {
+  string cpu_limit = 1 [
+    (buf.validate.field).string.max_len = 32
+  ];
+  string memory_limit = 2 [
+    (buf.validate.field).string.max_len = 32
+  ];
+  int32 pids_limit = 3 [
+    (buf.validate.field).int32.gte = 0
+  ];
+  string timeout = 4 [
+    (buf.validate.field).string.max_len = 32
+  ];
+}
+
+message ResourceUsage {
+  int64 cpu_ms = 1 [
+    (buf.validate.field).int64.gte = 0
+  ];
+  int64 memory_bytes = 2 [
+    (buf.validate.field).int64.gte = 0
+  ];
+  int64 io_bytes = 3 [
+    (buf.validate.field).int64.gte = 0
+  ];
+}
+
+enum ToolType {
+  TOOL_TYPE_UNSPECIFIED = 0;
+  TOOL_TYPE_FILESYSTEM = 1;
+  TOOL_TYPE_SHELL = 2;
+  TOOL_TYPE_GIT = 3;
+  TOOL_TYPE_TEST = 4;
+  TOOL_TYPE_NETWORK = 5;
+}

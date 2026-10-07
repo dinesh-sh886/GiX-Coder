@@ -1,0 +1,140 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: gix-coder-dev
+
+resources:
+  - ../../base
+
+commonLabels:
+  environment: dev
+
+namePrefix: dev-
+
+patches:
+  - patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: gix-coder-config
+      data:
+        ENVIRONMENT: "development"
+        LOG_LEVEL: "debug"
+        LOG_FORMAT: "console"
+        TRACING_RATIO: "1.0"
+        GATEWAY_NEW_ROUTING: "true"
+        GATEWAY_ENHANCED_AUTH: "true"
+        SANDBOX_FIRECRACKER_ENABLED: "true"
+        ROUTER_ML_CLASSIFIER: "true"
+        HARNESS_CHECKPOINTING: "true"
+        GATEWAY_HTTP_PORT: "8080"
+        GATEWAY_GRPC_PORT: "9090"
+    target:
+      kind: ConfigMap
+      name: gix-coder-config
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: gateway
+      spec:
+        replicas: 1
+      spec:
+        template:
+          spec:
+            containers:
+              - name: gateway
+                resources:
+                  requests:
+                    cpu: "50m"
+                    memory: "64Mi"
+                  limits:
+                    cpu: "500m"
+                    memory: "256Mi"
+    target:
+      kind: Deployment
+      name: gateway
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: harness
+      spec:
+        replicas: 1
+    target:
+      kind: Deployment
+      name: harness
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: sandbox
+      spec:
+        replicas: 1
+    target:
+      kind: Deployment
+      name: sandbox
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: router
+      spec:
+        replicas: 1
+    target:
+      kind: Deployment
+      name: router
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: workflow
+      spec:
+        replicas: 1
+    target:
+      kind: Deployment
+      name: workflow
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: policy
+      spec:
+        replicas: 1
+    target:
+      kind: Deployment
+      name: policy
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: audit
+      spec:
+        replicas: 1
+    target:
+      kind: Deployment
+      name: audit
+
+configMapGenerator:
+  - name: gix-coder-config-dev
+    behavior: merge
+    literals:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+      - LOG_FORMAT=console
+      - TRACING_RATIO=1.0
+      - GATEWAY_NEW_ROUTING=true
+      - GATEWAY_ENHANCED_AUTH=true
+      - SANDBOX_FIRECRACKER_ENABLED=true
+      - ROUTER_ML_CLASSIFIER=true
+      - HARNESS_CHECKPOINTING=true
+
+generatorOptions:
+  disableNameSuffixHash: true

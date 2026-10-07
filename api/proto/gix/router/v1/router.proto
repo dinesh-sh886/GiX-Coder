@@ -1,0 +1,298 @@
+syntax = "proto3";
+
+package gix.router.v1;
+
+option go_package = "github.com/gix-coder/gix-coder/api/proto/gix/router/v1;routerv1";
+
+import "api/proto/gix/shared/v1/common.proto";
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+service RouterService {
+  rpc ClassifyTask(ClassifyTaskRequest) returns (ClassifyTaskResponse) {
+    option (google.api.http) = {
+      post: "/router/classify"
+      body: "*"
+    };
+  }
+  
+  rpc SelectModel(SelectModelRequest) returns (SelectModelResponse) {
+    option (google.api.http) = {
+      post: "/router/models:select"
+      body: "*"
+    };
+  }
+  
+  rpc ValidateOutput(ValidateOutputRequest) returns (ValidateOutputResponse) {
+    option (google.api.http) = {
+      post: "/router/outputs:validate"
+      body: "*"
+    };
+  }
+  
+  rpc CheckBudget(CheckBudgetRequest) returns (CheckBudgetResponse) {
+    option (google.api.http) = {
+      post: "/router/budget:check"
+      body: "*"
+    };
+  }
+  
+  rpc ReleaseBudget(ReleaseBudgetRequest) returns (ReleaseBudgetResponse) {
+    option (google.api.http) = {
+      post: "/router/budget:release"
+      body: "*"
+    };
+  }
+  
+  rpc GetProviders(GetProvidersRequest) returns (GetProvidersResponse) {
+    option (google.api.http) = {
+      get: "/router/providers"
+    };
+  }
+  
+  rpc HealthLive(HealthLiveRequest) returns (HealthLiveResponse) {
+    option (google.api.http) = {
+      get: "/health/live"
+    };
+  }
+  rpc HealthReady(HealthReadyRequest) returns (HealthReadyResponse) {
+    option (google.api.http) = {
+      get: "/health/ready"
+    };
+  }
+}
+
+message ClassifyTaskRequest {
+  string prompt = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32768
+  ];
+  map<string, string> context = 2;
+  string workflow_type = 3 [
+    (buf.validate.field).string.max_len = 64
+  ];
+  string tenant_id = 4 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string correlation_id = 5 [
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message ClassifyTaskResponse {
+  string complexity = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  string domain = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  repeated string required_capabilities = 3;
+  int32 estimated_tokens = 4 [
+    (buf.validate.field).int32.gte = 0
+  ];
+  int32 latency_requirement_ms = 5 [
+    (buf.validate.field).int32.gte = 0
+  ];
+}
+
+message SelectModelRequest {
+  ClassifyTaskResponse classification = 1;
+  string tenant_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string workflow_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  int32 token_budget = 4 [
+    (buf.validate.field).int32.gte = 0
+  ];
+  repeated ModelMetadata allowed_models = 5;
+  string policy_version = 6 [
+    (buf.validate.field).string.max_len = 64
+  ];
+}
+
+message SelectModelResponse {
+  string model_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string provider = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  string endpoint = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+  int32 token_budget = 4 [
+    (buf.validate.field).int32.gte = 0
+  ];
+  map<string, string> parameters = 5;
+  int32 estimated_cost = 6 [
+    (buf.validate.field).int32.gte = 0
+  ];
+}
+
+message ValidateOutputRequest {
+  string model_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string output = 2 [
+    (buf.validate.field).string.min_len = 1
+  ];
+  string expected_schema = 3 [
+    (buf.validate.field).string.max_len = 65536
+  ];
+  string tenant_id = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string correlation_id = 5 [
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message ValidateOutputResponse {
+  bool valid = 1;
+  string validated_output = 2;
+  repeated ValidationWarning warnings = 3;
+  string error = 4 [
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+message ValidationWarning {
+  string field = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string message = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+  string severity = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 16
+  ];
+}
+
+message CheckBudgetRequest {
+  string tenant_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string workflow_id = 4 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  int32 estimated_tokens = 5 [
+    (buf.validate.field).int32.gte = 0
+  ];
+  string model_id = 6 [
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message CheckBudgetResponse {
+  bool allowed = 1;
+  int32 remaining_budget = 2 [
+    (buf.validate.field).int32.gte = 0
+  ];
+  int32 estimated_cost = 3 [
+    (buf.validate.field).int32.gte = 0
+  ];
+  string denial_reason = 4 [
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+message ReleaseBudgetRequest {
+  string tenant_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string workflow_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  int32 tokens_to_release = 3 [
+    (buf.validate.field).int32.gte = 0
+  ];
+}
+
+message ReleaseBudgetResponse {
+  bool success = 1;
+  int32 remaining_budget = 2 [
+    (buf.validate.field).int32.gte = 0
+  ];
+}
+
+message ModelMetadata {
+  string model_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string provider = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  string name = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  int32 max_tokens = 4 [
+    (buf.validate.field).int32.gt = 0
+  ];
+  int32 max_output_tokens = 5 [
+    (buf.validate.field).int32.gt = 0
+  ];
+  double input_cost_per_1k = 6 [
+    (buf.validate.field).double.gte = 0
+  ];
+  double output_cost_per_1k = 7 [
+    (buf.validate.field).double.gte = 0
+  ];
+  double latency_p50_ms = 8 [
+    (buf.validate.field).double.gte = 0
+  ];
+  double latency_p99_ms = 9 [
+    (buf.validate.field).double.gte = 0
+  ];
+  repeated string capabilities = 10;
+  bool available = 11;
+  map<string, string> metadata = 12;
+}
+
+message GetProvidersRequest {
+  string tenant_id = 1 [
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message GetProvidersResponse {
+  repeated ModelMetadata providers = 1;
+}
+
+message HealthLiveRequest {}
+
+message HealthLiveResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+}
+
+message HealthReadyRequest {}
+
+message HealthReadyResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  repeated gix.shared.v1.HealthCheck checks = 2;
+}

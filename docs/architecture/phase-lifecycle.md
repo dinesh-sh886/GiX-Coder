@@ -77,20 +77,20 @@ Every phase follows a rigorous lifecycle ensuring governance, quality, and human
 
 ## Phase States
 
-| State | Description | Entry Criteria | Exit Criteria |
-|-------|-------------|----------------|---------------|
-| `PROPOSED` | Phase requested | Human prompt | Requirements documented |
-| `PLANNING` | Architecture + Plan | Requirements accepted | Architecture.md, Plan.md, Acceptance-criteria.md approved |
-| `IMPLEMENTING` | Code being written | Plan approved | Implementation.md complete, PRs opened |
-| `VERIFYING` | Independent validation | Implementation reported | Verification.md complete (PASS) |
-| `REMEDIATING` | Fixing failures | Verification FAIL | Remediation.md complete, re-verify PASS |
-| `GATING` | Quality gates | Verification PASS | All gates green |
-| `APPROVING` | Human sign-off | Gates green | Approval.md signed |
-| `MERGING` | PR to develop | Approved | Merged to develop |
-| `DEV_DEPLOYED` | Running in DEV | Merged | DEV smoke tests pass |
-| `STAGING` | Deployed to STAGE | DEV validated | STAGE acceptance tests pass |
-| `PROD_APPROVED` | Human production approval | STAGE validated | Approval recorded |
-| `COMPLETE` | In production | PROD deployed | Health verified, monitoring stable |
+| State           | Description               | Entry Criteria          | Exit Criteria                                             |
+| --------------- | ------------------------- | ----------------------- | --------------------------------------------------------- |
+| `PROPOSED`      | Phase requested           | Human prompt            | Requirements documented                                   |
+| `PLANNING`      | Architecture + Plan       | Requirements accepted   | Architecture.md, Plan.md, Acceptance-criteria.md approved |
+| `IMPLEMENTING`  | Code being written        | Plan approved           | Implementation.md complete, PRs opened                    |
+| `VERIFYING`     | Independent validation    | Implementation reported | Verification.md complete (PASS)                           |
+| `REMEDIATING`   | Fixing failures           | Verification FAIL       | Remediation.md complete, re-verify PASS                   |
+| `GATING`        | Quality gates             | Verification PASS       | All gates green                                           |
+| `APPROVING`     | Human sign-off            | Gates green             | Approval.md signed                                        |
+| `MERGING`       | PR to develop             | Approved                | Merged to develop                                         |
+| `DEV_DEPLOYED`  | Running in DEV            | Merged                  | DEV smoke tests pass                                      |
+| `STAGING`       | Deployed to STAGE         | DEV validated           | STAGE acceptance tests pass                               |
+| `PROD_APPROVED` | Human production approval | STAGE validated         | Approval recorded                                         |
+| `COMPLETE`      | In production             | PROD deployed           | Health verified, monitoring stable                        |
 
 ## Phase Artifacts (Required)
 
@@ -112,6 +112,7 @@ docs/phases/phase-XX/
 ### Artifact Standards
 
 **requirements.md**
+
 - Functional requirements (user stories, use cases)
 - Non-functional requirements (performance, security, reliability)
 - Constraints (budget, timeline, technology)
@@ -119,6 +120,7 @@ docs/phases/phase-XX/
 - Out of scope
 
 **architecture.md**
+
 - Changes from baseline
 - New modules/components
 - Interface definitions
@@ -128,6 +130,7 @@ docs/phases/phase-XX/
 - ADRs created/updated
 
 **plan.md**
+
 - Task breakdown (WBS)
 - Dependencies (internal, external)
 - Sequence and parallelization
@@ -137,12 +140,14 @@ docs/phases/phase-XX/
 - Milestones
 
 **acceptance-criteria.md**
+
 - Each criterion: ID, Description, Test Method, Pass/Fail Threshold
 - Traceable to requirements
 - Automated where possible
 - Manual verification steps documented
 
 **implementation.md**
+
 - Summary of changes
 - Deviations from plan (with justification)
 - Key decisions made during implementation
@@ -151,6 +156,7 @@ docs/phases/phase-XX/
 - Security considerations
 
 **verification.md**
+
 - Test execution results (all levels)
 - Quality gate results
 - Acceptance criteria validation (PASS/FAIL each)
@@ -159,6 +165,7 @@ docs/phases/phase-XX/
 - Evidence links (CI runs, test reports, screenshots)
 
 **remediation.md** (if needed)
+
 - Issue description
 - Root cause
 - Fix applied
@@ -166,16 +173,18 @@ docs/phases/phase-XX/
 - Re-verification result
 
 **approval.md**
-| Role | Name | Date | Signature |
-|------|------|------|-----------|
-| Architect | | | |
-| Security | | | |
-| Product | | | |
-| Release | | | |
+
+| Role      | Name | Date | Signature |
+| --------- | ---- | ---- | --------- |
+| Architect |      |      |           |
+| Security  |      |      |           |
+| Product   |      |      |           |
+| Release   |      |      |           |
 
 ## Phase Gates (Blocking)
 
 ### Gate 1: Plan Approval
+
 - Requirements reviewed by Product
 - Architecture reviewed by Architect
 - Plan reviewed by Architect + Planner
@@ -183,6 +192,7 @@ docs/phases/phase-XX/
 - **All reviewers approve** → Proceed to IMPLEMENTING
 
 ### Gate 2: Verification Pass
+
 - Verifier independent (not Builder)
 - All acceptance criteria PASS
 - All quality gates PASS
@@ -190,11 +200,13 @@ docs/phases/phase-XX/
 - **Verifier signs** → Proceed to GATING
 
 ### Gate 3: Quality Gates
+
 - All automated gates PASS (see quality-gates.md)
 - No exceptions without ADR
 - **CI/CD system validates** → Proceed to APPROVING
 
 ### Gate 4: Human Approval
+
 - Architect: Architecture compliance
 - Security: Security posture
 - Product: Requirements met
@@ -202,6 +214,7 @@ docs/phases/phase-XX/
 - **All sign approval.md** → Proceed to MERGING
 
 ### Gate 5: Production Approval
+
 - On-call: Operational readiness
 - Security: No outstanding critical findings
 - Product: Business approval
@@ -209,12 +222,12 @@ docs/phases/phase-XX/
 
 ## Phase Duration Guidelines
 
-| Phase Type | Target Duration | Max Duration |
-|------------|-----------------|--------------|
-| Governance (00) | 1-2 weeks | 2 weeks |
-| Foundation (01-03) | 2-4 weeks | 6 weeks |
-| Feature (04+) | 1-3 weeks | 4 weeks |
-| Hotfix | 1-3 days | 1 week |
+| Phase Type         | Target Duration | Max Duration |
+| ------------------ | --------------- | ------------ |
+| Governance (00)    | 1-2 weeks       | 2 weeks      |
+| Foundation (01-03) | 2-4 weeks       | 6 weeks      |
+| Feature (04+)      | 1-3 weeks       | 4 weeks      |
+| Hotfix             | 1-3 days        | 1 week       |
 
 ## Parallel Phases
 
@@ -228,6 +241,7 @@ docs/phases/phase-XX/
 ## Phase Completion Criteria
 
 Phase is **COMPLETE** only when:
+
 - [ ] All acceptance criteria PASS (verified independently)
 - [ ] All quality gates PASS
 - [ ] All approvals recorded
@@ -240,6 +254,7 @@ Phase is **COMPLETE** only when:
 ## Retrospective
 
 Every phase completes with retrospective:
+
 - What went well?
 - What didn't?
 - Process improvements?
@@ -248,14 +263,14 @@ Every phase completes with retrospective:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Consequence |
-|--------------|-------------|
-| Skipping verification | Undetected defects |
-| Builder = Verifier | Bias, missed issues |
-| Human approval skipped | Authority violation |
-| Gates weakened to pass | Technical debt accumulation |
-| Phase declared complete without PROD | False completion |
-| No retrospective | Repeated mistakes |
+| Anti-Pattern                         | Consequence                 |
+| ------------------------------------ | --------------------------- |
+| Skipping verification                | Undetected defects          |
+| Builder = Verifier                   | Bias, missed issues         |
+| Human approval skipped               | Authority violation         |
+| Gates weakened to pass               | Technical debt accumulation |
+| Phase declared complete without PROD | False completion            |
+| No retrospective                     | Repeated mistakes           |
 
 ---
 
@@ -272,6 +287,7 @@ Every phase completes with retrospective:
 ## Metadata
 
 ---
+
 title: GiX-Coder Phase Lifecycle
 type: architecture
 phase: 00

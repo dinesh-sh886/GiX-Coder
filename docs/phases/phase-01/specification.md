@@ -9,6 +9,7 @@
 ## Goals
 
 Deliver the core execution platform:
+
 1. **Agent Gateway** - API entry point, auth, routing, rate limiting
 2. **Execution Sandbox** - Isolated, capability-controlled execution environment
 3. **Context/Policy/Model Router** - Intelligent model routing with policy enforcement
@@ -19,6 +20,7 @@ Deliver the core execution platform:
 ### In Scope
 
 #### Agent Gateway (`gateway/`)
+
 - REST/gRPC API for workflow submission
 - Authentication (JWT, OIDC)
 - Authorization (policy engine integration)
@@ -28,6 +30,7 @@ Deliver the core execution platform:
 - Observability (logs, metrics, traces, audit)
 
 #### Execution Sandbox (`sandbox/`)
+
 - gVisor-based isolation (primary) / Firecracker (alternative)
 - Capability-based access control:
   - Filesystem (read/write/list, path-scoped)
@@ -40,6 +43,7 @@ Deliver the core execution platform:
 - Audit logging of all operations
 
 #### Context/Policy/Model Router (`router/`)
+
 - Task classification (complexity, domain, requirements)
 - Model selection (cost, latency, capability, policy)
 - Policy evaluation (OPA/Cedar integration)
@@ -48,6 +52,7 @@ Deliver the core execution platform:
 - Output validation (schema, safety)
 
 #### Agent Harness (`harness/`)
+
 - Agent lifecycle (spawn, execute, checkpoint, terminate)
 - Capability grant management
 - Tool registry (built-in + MCP)
@@ -56,6 +61,7 @@ Deliver the core execution platform:
 - State persistence (checkpointing)
 
 #### Shared Infrastructure (`shared/`)
+
 - Typed error definitions
 - Structured logging (zerolog/pino)
 - Configuration management (Viper)
@@ -65,18 +71,21 @@ Deliver the core execution platform:
 - DTOs for all service boundaries
 
 #### API Definitions (`api/`)
+
 - Protobuf definitions for all services
 - OpenAPI 3.1 for REST endpoints
 - Generated clients (Go, TypeScript)
 - Contract tests (Pact)
 
 #### Deployment (`deploy/`)
+
 - Kubernetes manifests (base + overlays)
 - Dockerfiles (multi-stage, distroless)
 - Docker Compose for local development
 - Helm charts for production
 
 ### Out of Scope
+
 - Durable Workflow Engine (Phase 02)
 - CLI/IDE/Web interfaces (Phase 03)
 - Multi-tenancy/RBAC (Phase 04)
@@ -88,43 +97,43 @@ Deliver the core execution platform:
 
 ### Functional Requirements
 
-| ID | Requirement | Priority |
-|----|-------------|----------|
-| FR-01 | Submit workflow via REST API | P0 |
-| FR-02 | Authenticate requests via JWT/OIDC | P0 |
-| FR-03 | Authorize via policy engine | P0 |
-| FR-04 | Route to workflow engine | P0 |
-| FR-05 | Rate limit per tenant/workflow | P0 |
-| FR-06 | Execute code in isolated sandbox | P0 |
-| FR-07 | Grant file capabilities (path-scoped) | P0 |
-| FR-08 | Grant shell capabilities (allowlist) | P0 |
-| FR-09 | Grant Git capabilities (repo-scoped) | P0 |
-| FR-10 | Grant test execution capabilities | P0 |
-| FR-11 | Grant MCP tool capabilities | P0 |
-| FR-12 | Enforce resource limits | P0 |
-| FR-13 | Classify task for model routing | P0 |
-| FR-14 | Select model per policy | P0 |
-| FR-15 | Enforce token budgets | P0 |
-| FR-16 | Validate model outputs | P0 |
-| FR-17 | Spawn/manage agent lifecycle | P0 |
-| FR-18 | Register/execute tools | P0 |
-| FR-19 | Integrate MCP tools | P0 |
-| FR-20 | Checkpoint/restore agent state | P1 |
+| ID    | Requirement                           | Priority |
+| ----- | ------------------------------------- | -------- |
+| FR-01 | Submit workflow via REST API          | P0       |
+| FR-02 | Authenticate requests via JWT/OIDC    | P0       |
+| FR-03 | Authorize via policy engine           | P0       |
+| FR-04 | Route to workflow engine              | P0       |
+| FR-05 | Rate limit per tenant/workflow        | P0       |
+| FR-06 | Execute code in isolated sandbox      | P0       |
+| FR-07 | Grant file capabilities (path-scoped) | P0       |
+| FR-08 | Grant shell capabilities (allowlist)  | P0       |
+| FR-09 | Grant Git capabilities (repo-scoped)  | P0       |
+| FR-10 | Grant test execution capabilities     | P0       |
+| FR-11 | Grant MCP tool capabilities           | P0       |
+| FR-12 | Enforce resource limits               | P0       |
+| FR-13 | Classify task for model routing       | P0       |
+| FR-14 | Select model per policy               | P0       |
+| FR-15 | Enforce token budgets                 | P0       |
+| FR-16 | Validate model outputs                | P0       |
+| FR-17 | Spawn/manage agent lifecycle          | P0       |
+| FR-18 | Register/execute tools                | P0       |
+| FR-19 | Integrate MCP tools                   | P0       |
+| FR-20 | Checkpoint/restore agent state        | P1       |
 
 ### Non-Functional Requirements
 
-| ID | Requirement | Target |
-|----|-------------|--------|
-| NFR-01 | Gateway p99 latency | < 100ms |
-| NFR-02 | Sandbox cold start | < 10s |
-| NFR-03 | Sandbox warm start | < 2s |
-| NFR-04 | Concurrent executions | 1000 |
-| NFR-05 | Availability | 99.9% |
-| NFR-06 | Audit log durability | 11 nines |
-| NFR-07 | Zero critical vulnerabilities | Continuous |
-| NFR-08 | Sandbox escape resistance | gVisor/Firecracker verified |
-| NFR-09 | Configuration immutability | Runtime |
-| NFR-10 | Observability coverage | 100% endpoints |
+| ID     | Requirement                   | Target                      |
+| ------ | ----------------------------- | --------------------------- |
+| NFR-01 | Gateway p99 latency           | < 100ms                     |
+| NFR-02 | Sandbox cold start            | < 10s                       |
+| NFR-03 | Sandbox warm start            | < 2s                        |
+| NFR-04 | Concurrent executions         | 1000                        |
+| NFR-05 | Availability                  | 99.9%                       |
+| NFR-06 | Audit log durability          | 11 nines                    |
+| NFR-07 | Zero critical vulnerabilities | Continuous                  |
+| NFR-08 | Sandbox escape resistance     | gVisor/Firecracker verified |
+| NFR-09 | Configuration immutability    | Runtime                     |
+| NFR-10 | Observability coverage        | 100% endpoints              |
 
 ## Architecture
 
@@ -235,6 +244,7 @@ Deliver the core execution platform:
 ## Implementation Plan
 
 ### Week 1: Foundation & Gateway
+
 - [ ] Shared kernel (errors, logging, config, metrics, tracing, validation, DTOs)
 - [ ] API definitions (protobuf + OpenAPI)
 - [ ] Gateway: Auth, rate limit, validation, routing stub
@@ -243,6 +253,7 @@ Deliver the core execution platform:
 - [ ] Local dev environment (docker-compose)
 
 ### Week 2: Sandbox & Router
+
 - [ ] Sandbox: gVisor integration, capability framework
 - [ ] Sandbox: Filesystem tool (read/write/list)
 - [ ] Sandbox: Shell tool (allowlist, limits)
@@ -252,6 +263,7 @@ Deliver the core execution platform:
 - [ ] Router: Output validation
 
 ### Week 3: Harness & Integration
+
 - [ ] Harness: Agent lifecycle, capability grants
 - [ ] Harness: Tool registry, built-in tools
 - [ ] Harness: MCP client implementation
@@ -260,6 +272,7 @@ Deliver the core execution platform:
 - [ ] End-to-end test: Simple workflow execution
 
 ### Week 4: Hardening & Validation
+
 - [ ] Security hardening (seccomp, capabilities, network policies)
 - [ ] Performance optimization (warm pools, connection reuse)
 - [ ] Chaos testing (sandbox kill, network partition)
@@ -269,43 +282,44 @@ Deliver the core execution platform:
 
 ## Acceptance Criteria
 
-| ID | Criterion | Test Method |
-|----|-----------|-------------|
-| AC-01 | Gateway accepts valid workflow request | Integration test |
-| AC-02 | Gateway rejects invalid JWT | Unit + Integration |
-| AC-03 | Gateway enforces rate limits | Load test |
-| AC-04 | Sandbox executes file read/write | Integration test |
-| AC-05 | Sandbox blocks unauthorized paths | Security test |
-| AC-06 | Sandbox executes allowed shell commands | Integration test |
-| AC-07 | Sandbox blocks disallowed commands | Security test |
-| AC-08 | Sandbox enforces CPU/memory limits | Stress test |
-| AC-09 | Sandbox prevents network egress | Network test |
-| AC-10 | Router classifies task correctly | Unit test (fixtures) |
-| AC-11 | Router selects model per policy | Integration test |
-| AC-12 | Router enforces token budget | Integration test |
-| AC-13 | Harness spawns agent with grants | Integration test |
-| AC-14 | Harness executes MCP tool | Integration test |
-| AC-15 | Checkpoint/restore works | Integration test |
-| AC-16 | Full workflow executes end-to-end | E2E test |
-| AC-17 | Audit log captures all events | Verification |
-| AC-18 | All quality gates pass | CI/CD pipeline |
-| AC-19 | No critical/high vulnerabilities | Security scan |
-| AC-20 | Documentation complete | Review |
+| ID    | Criterion                               | Test Method          |
+| ----- | --------------------------------------- | -------------------- |
+| AC-01 | Gateway accepts valid workflow request  | Integration test     |
+| AC-02 | Gateway rejects invalid JWT             | Unit + Integration   |
+| AC-03 | Gateway enforces rate limits            | Load test            |
+| AC-04 | Sandbox executes file read/write        | Integration test     |
+| AC-05 | Sandbox blocks unauthorized paths       | Security test        |
+| AC-06 | Sandbox executes allowed shell commands | Integration test     |
+| AC-07 | Sandbox blocks disallowed commands      | Security test        |
+| AC-08 | Sandbox enforces CPU/memory limits      | Stress test          |
+| AC-09 | Sandbox prevents network egress         | Network test         |
+| AC-10 | Router classifies task correctly        | Unit test (fixtures) |
+| AC-11 | Router selects model per policy         | Integration test     |
+| AC-12 | Router enforces token budget            | Integration test     |
+| AC-13 | Harness spawns agent with grants        | Integration test     |
+| AC-14 | Harness executes MCP tool               | Integration test     |
+| AC-15 | Checkpoint/restore works                | Integration test     |
+| AC-16 | Full workflow executes end-to-end       | E2E test             |
+| AC-17 | Audit log captures all events           | Verification         |
+| AC-18 | All quality gates pass                  | CI/CD pipeline       |
+| AC-19 | No critical/high vulnerabilities        | Security scan        |
+| AC-20 | Documentation complete                  | Review               |
 
 ## Risks & Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| gVisor compatibility issues | Medium | High | Prototype early, Firecracker fallback |
-| MCP protocol changes | Low | Medium | Pin version, adapter pattern |
-| Model router complexity | Medium | Medium | Start simple, iterate |
-| Sandbox performance | Medium | High | Warm pool, benchmark early |
-| Policy engine integration | Low | High | Define interface early, mock |
-| Cross-module integration | Medium | High | Contract tests, daily integration |
+| Risk                        | Likelihood | Impact | Mitigation                            |
+| --------------------------- | ---------- | ------ | ------------------------------------- |
+| gVisor compatibility issues | Medium     | High   | Prototype early, Firecracker fallback |
+| MCP protocol changes        | Low        | Medium | Pin version, adapter pattern          |
+| Model router complexity     | Medium     | Medium | Start simple, iterate                 |
+| Sandbox performance         | Medium     | High   | Warm pool, benchmark early            |
+| Policy engine integration   | Low        | High   | Define interface early, mock          |
+| Cross-module integration    | Medium     | High   | Contract tests, daily integration     |
 
 ## Quality Gates (Phase 01 Specific)
 
 Additional to standard gates:
+
 - [ ] Sandbox escape tests pass (gVisor test suite)
 - [ ] Capability enforcement tests pass (100% coverage)
 - [ ] Resource limit enforcement verified (stress test)
@@ -317,6 +331,7 @@ Additional to standard gates:
 ## Deliverables
 
 ### Code
+
 - `gateway/` - Complete, tested, documented
 - `sandbox/` - Complete, tested, documented
 - `router/` - Complete, tested, documented
@@ -328,6 +343,7 @@ Additional to standard gates:
 - `api/` - Complete protobuf + OpenAPI
 
 ### Documentation
+
 - `docs/phases/phase-01/README.md`
 - `docs/phases/phase-01/requirements.md`
 - `docs/phases/phase-01/architecture.md`
@@ -342,6 +358,7 @@ Additional to standard gates:
 - Runbooks (deploy, debug, scale)
 
 ### Infrastructure
+
 - Kubernetes manifests (dev, stage, prod overlays)
 - Docker images (signed, SBOM attested)
 - Helm charts
@@ -351,6 +368,7 @@ Additional to standard gates:
 ## Dependencies
 
 ### External Services (Stubs for Phase 01)
+
 - **Temporal** - Workflow engine (embedded for dev, external for stage/prod)
 - **PostgreSQL** - State persistence
 - **Redis** - Caching, rate limiting
@@ -359,6 +377,7 @@ Additional to standard gates:
 - **MCP Registry** - Tool registry
 
 ### Internal Dependencies
+
 - Phase 00 governance baseline (complete)
 - Shared kernel (built first)
 
@@ -375,6 +394,7 @@ Additional to standard gates:
 ## Metadata
 
 ---
+
 title: Phase 01 Specification
 type: phase
 phase: 01

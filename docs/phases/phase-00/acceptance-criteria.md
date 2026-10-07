@@ -58,6 +58,7 @@ Phase 00 is successful only if ALL criteria are met:
 ## Verification Method
 
 Each criterion verified by:
+
 1. File existence check
 2. Content validation against template/standard
 3. Cross-reference validation
@@ -65,18 +66,19 @@ Each criterion verified by:
 
 ## Sign-Off
 
-| Role | Name | Date | Signature |
-|------|------|------|-----------|
-| Architect | | | |
-| Security | | | |
-| Product | | | |
-| Release | | | |
+| Role      | Name | Date | Signature |
+| --------- | ---- | ---- | --------- |
+| Architect |      |      |           |
+| Security  |      |      |           |
+| Product   |      |      |           |
+| Release   |      |      |           |
 
 ---
 
 ## Metadata
 
 ---
+
 title: Phase 00 Acceptance Criteria
 type: phase
 phase: 00

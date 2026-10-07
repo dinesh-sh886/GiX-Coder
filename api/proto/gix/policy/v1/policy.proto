@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package gix.policy.v1;
+
+option go_package = "github.com/gix-coder/gix-coder/api/proto/gix/policy/v1;policyv1";
+
+import "api/proto/gix/shared/v1/common.proto";
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+service PolicyService {
+  rpc Evaluate(EvaluateRequest) returns (EvaluateResponse) {
+    option (google.api.http) = {
+      post: "/policy/evaluate"
+      body: "*"
+    };
+  }
+  
+  rpc GetCapabilities(GetCapabilitiesRequest) returns (GetCapabilitiesResponse) {
+    option (google.api.http) = {
+      get: "/policy/capabilities"
+    };
+  }
+  
+  rpc HealthLive(HealthLiveRequest) returns (HealthLiveResponse) {
+    option (google.api.http) = {
+      get: "/health/live"
+    };
+  }
+  rpc HealthReady(HealthReadyRequest) returns (HealthReadyResponse) {
+    option (google.api.http) = {
+      get: "/health/ready"
+    };
+  }
+}
+
+message EvaluateRequest {
+  gix.shared.v1.Identity identity = 1;
+  string resource = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 256
+  ];
+  string action = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  map<string, string> context = 4;
+}
+
+message EvaluateResponse {
+  string decision = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 16
+  ];
+  repeated gix.shared.v1.CapabilityGrant grants = 2;
+  repeated string obligations = 3;
+  string reason = 4 [
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+message GetCapabilitiesRequest {
+  string tenant_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string workflow_id = 2 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string workflow_type = 3 [
+    (buf.validate.field).string.max_len = 64
+  ];
+}
+
+message GetCapabilitiesResponse {
+  repeated gix.shared.v1.CapabilityGrant grants = 1;
+}
+
+message HealthLiveRequest {}
+
+message HealthLiveResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+}
+
+message HealthReadyRequest {}
+
+message HealthReadyResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  repeated gix.shared.v1.HealthCheck checks = 2;
+}

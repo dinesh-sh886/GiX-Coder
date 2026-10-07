@@ -1,0 +1,507 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/proto/gix/gateway/v1/gateway.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "GatewayService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/health/live": {
+      "get": {
+        "summary": "Health check endpoints",
+        "operationId": "GatewayService_HealthLive",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gixgatewayv1HealthLiveResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "GatewayService"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "GatewayService_HealthReady",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gixgatewayv1HealthReadyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "GatewayService"
+        ]
+      }
+    },
+    "/workflows/execute": {
+      "post": {
+        "summary": "ExecuteWorkflow submits a workflow for execution",
+        "operationId": "GatewayService_ExecuteWorkflow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ExecuteWorkflowResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ExecuteWorkflowRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GatewayService"
+        ]
+      }
+    },
+    "/workflows/{executionId}": {
+      "get": {
+        "summary": "GetExecution gets the status and result of an execution",
+        "operationId": "GatewayService_GetExecution",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gixgatewayv1GetExecutionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "executionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GatewayService"
+        ]
+      }
+    },
+    "/workflows/{executionId}:cancel": {
+      "post": {
+        "summary": "CancelExecution cancels a running execution",
+        "operationId": "GatewayService_CancelExecution",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gixgatewayv1CancelExecutionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "executionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GatewayServiceCancelExecutionBody"
+            }
+          }
+        ],
+        "tags": [
+          "GatewayService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "gixgatewayv1CancelExecutionResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "title": "CancelExecutionResponse represents a cancel execution response"
+    },
+    "gixgatewayv1ExecutionRecord": {
+      "type": "object",
+      "properties": {
+        "executionId": {
+          "type": "string"
+        },
+        "workflowId": {
+          "type": "string"
+        },
+        "workflowType": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "errorCode": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "correlationId": {
+          "type": "string"
+        },
+        "tenantId": {
+          "type": "string"
+        }
+      },
+      "title": "ExecutionRecord represents an execution record"
+    },
+    "gixgatewayv1GetExecutionResponse": {
+      "type": "object",
+      "properties": {
+        "execution": {
+          "$ref": "#/definitions/gixgatewayv1ExecutionRecord"
+        }
+      },
+      "title": "GetExecutionResponse represents a get execution response"
+    },
+    "gixgatewayv1HealthLiveResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        }
+      },
+      "title": "HealthLiveResponse represents a liveness check response"
+    },
+    "gixgatewayv1HealthReadyResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1HealthCheck"
+          }
+        }
+      },
+      "title": "HealthReadyResponse represents a readiness check response"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "Identifies the type of the serialized Protobuf message with a URI reference\nconsisting of a prefix ending in a slash and the fully-qualified type name.\n\nExample: type.googleapis.com/google.protobuf.StringValue\n\nThis string must contain at least one `/` character, and the content after\nthe last `/` must be the fully-qualified name of the type in canonical\nform, without a leading dot. Do not write a scheme on these URI references\nso that clients do not attempt to contact them.\n\nThe prefix is arbitrary and Protobuf implementations are expected to\nsimply strip off everything up to and including the last `/` to identify\nthe type. `type.googleapis.com/` is a common default prefix that some\nlegacy implementations require. This prefix does not indicate the origin of\nthe type, and URIs containing it are not expected to respond to any\nrequests.\n\nAll type URL strings must be legal URI references with the additional\nrestriction (for the text format) that the content of the reference\nmust consist only of alphanumeric characters, percent-encoded escapes, and\ncharacters in the following set (not including the outer backticks):\n`/-.~_!$\u0026()*+,;=`. Despite our allowing percent encodings, implementations\nshould not unescape them to prevent confusion with existing parsers. For\nexample, `type.googleapis.com%2FFoo` should be rejected.\n\nIn the original design of `Any`, the possibility of launching a type\nresolution service at these type URLs was considered but Protobuf never\nimplemented one and considers contacting these URLs to be problematic and\na potential security issue. Do not attempt to contact type URLs."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nIn its binary encoding, an `Any` is an ordinary message; but in other wire\nforms like JSON, it has a special encoding. The format of the type URL is\ndescribed on the `type_url` field.\n\nProtobuf APIs provide utilities to interact with `Any` values:\n\n- A 'pack' operation accepts a message and constructs a generic `Any` wrapper\n  around it.\n- An 'unpack' operation reads the content of an `Any` message, either into an\n  existing message or a new one. Unpack operations must check the type of the\n  value they unpack against the declared `type_url`.\n- An 'is' operation decides whether an `Any` contains a message of the given\n  type, i.e. whether it can 'unpack' that type.\n\nThe JSON format representation of an `Any` follows one of these cases:\n\n- For types without special-cased JSON encodings, the JSON format\n  representation of the `Any` is the same as that of the message, with an\n  additional `@type` field which contains the type URL.\n- For types with special-cased JSON encodings (typically called 'well-known'\n  types, listed in https://protobuf.dev/programming-guides/json/#any), the\n  JSON format representation has a key `@type` which contains the type URL\n  and a key `value` which contains the JSON-serialized value.\n\nThe text format representation of an `Any` is like a message with one field\nwhose name is the type URL in brackets. For example, an `Any` containing a\n`foo.Bar` message may be written `[type.googleapis.com/foo.Bar] { a: 2 }`."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CapabilityGrantRequest": {
+      "type": "object",
+      "properties": {
+        "capabilityType": {
+          "$ref": "#/definitions/v1CapabilityType"
+        },
+        "resourceScope": {
+          "type": "string"
+        },
+        "constraints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "ttlSeconds": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "CapabilityGrantRequest represents a capability grant request"
+    },
+    "v1CapabilityType": {
+      "type": "string",
+      "enum": [
+        "CAPABILITY_TYPE_UNSPECIFIED",
+        "CAPABILITY_TYPE_FILESYSTEM_READ",
+        "CAPABILITY_TYPE_FILESYSTEM_WRITE",
+        "CAPABILITY_TYPE_FILESYSTEM_LIST",
+        "CAPABILITY_TYPE_SHELL_EXECUTE",
+        "CAPABILITY_TYPE_GIT_READ",
+        "CAPABILITY_TYPE_GIT_WRITE",
+        "CAPABILITY_TYPE_TEST_EXECUTE",
+        "CAPABILITY_TYPE_NETWORK_EGRESS",
+        "CAPABILITY_TYPE_MCP_INVOKE"
+      ],
+      "default": "CAPABILITY_TYPE_UNSPECIFIED",
+      "title": "CapabilityType represents a capability type"
+    },
+    "v1ExecuteWorkflowRequest": {
+      "type": "object",
+      "properties": {
+        "workflowId": {
+          "type": "string"
+        },
+        "workflow": {
+          "$ref": "#/definitions/v1WorkflowDefinition"
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CapabilityGrantRequest"
+          }
+        },
+        "idempotencyKey": {
+          "type": "string"
+        }
+      },
+      "title": "ExecuteWorkflowRequest represents a workflow execution request"
+    },
+    "v1ExecuteWorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "executionId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "errorCode": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "ExecuteWorkflowResponse represents a workflow execution response"
+    },
+    "v1GatewayServiceCancelExecutionBody": {
+      "type": "object",
+      "title": "CancelExecutionRequest represents a request to cancel execution"
+    },
+    "v1HealthCheck": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "latencyMs": {
+          "type": "string",
+          "format": "int64"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "title": "HealthCheck represents a health check"
+    },
+    "v1RetryPolicy": {
+      "type": "object",
+      "properties": {
+        "maxAttempts": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "intervalSeconds": {
+          "type": "string",
+          "format": "int64"
+        },
+        "backoff": {
+          "type": "number",
+          "format": "double"
+        },
+        "maxIntervalSeconds": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "RetryPolicy represents a retry policy"
+    },
+    "v1WorkflowDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1WorkflowStep"
+          }
+        },
+        "timeoutSeconds": {
+          "type": "string",
+          "format": "int64"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "WorkflowDefinition represents a workflow definition"
+    },
+    "v1WorkflowStep": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "condition": {
+          "type": "string"
+        },
+        "timeoutSeconds": {
+          "type": "string",
+          "format": "int64"
+        },
+        "retry": {
+          "$ref": "#/definitions/v1RetryPolicy"
+        },
+        "onFailure": {
+          "type": "string"
+        }
+      },
+      "title": "WorkflowStep represents a workflow step"
+    }
+  }
+}

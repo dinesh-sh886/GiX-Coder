@@ -13,12 +13,12 @@ This directory contains Architecture Decision Records (ADRs) for the GiX-Coder p
 
 ## ADR List
 
-| ID | Title | Status | Date | Author | Related |
-|----|-------|--------|------|--------|---------|
-| [0001](0001-control-plane-data-plane-separation.md) | Control Plane / Data Plane Separation | Accepted | 2024-10-07 | Architect | ADR-0002, ADR-0003, ADR-0004 |
-| [0002](0002-modular-monolith.md) | Modular Monolith | Accepted | 2024-10-07 | Architect | ADR-0001, ADR-0003, ADR-0004 |
-| [0003](0003-durable-workflow-engine.md) | Durable Workflow Engine | Accepted | 2024-10-07 | Platform Lead | ADR-0001, ADR-0002, ADR-0004 |
-| [0004](0004-sandbox-isolation.md) | Sandbox Isolation | Accepted | 2024-10-07 | Security Lead | ADR-0001, ADR-0002, ADR-0003 |
+| ID                                                  | Title                                 | Status   | Date       | Author        | Related                      |
+| --------------------------------------------------- | ------------------------------------- | -------- | ---------- | ------------- | ---------------------------- |
+| [0001](0001-control-plane-data-plane-separation.md) | Control Plane / Data Plane Separation | Accepted | 2024-10-07 | Architect     | ADR-0002, ADR-0003, ADR-0004 |
+| [0002](0002-modular-monolith.md)                    | Modular Monolith                      | Accepted | 2024-10-07 | Architect     | ADR-0001, ADR-0003, ADR-0004 |
+| [0003](0003-durable-workflow-engine.md)             | Durable Workflow Engine               | Accepted | 2024-10-07 | Platform Lead | ADR-0001, ADR-0002, ADR-0004 |
+| [0004](0004-sandbox-isolation.md)                   | Sandbox Isolation                     | Accepted | 2024-10-07 | Security Lead | ADR-0001, ADR-0002, ADR-0003 |
 
 ## Adding New ADRs
 
@@ -33,8 +33,8 @@ This directory contains Architecture Decision Records (ADRs) for the GiX-Coder p
 
 ## Example Future ADR
 
-| ID | Title | Status | Note |
-|----|-------|--------|------|
+| ID   | Title                    | Status   | Note                                           |
+| ---- | ------------------------ | -------- | ---------------------------------------------- |
 | 0005 | Example Future ADR Title | Proposed | Example entry - replace when creating ADR-0005 |
 
 ## ADR Lifecycle
@@ -51,6 +51,7 @@ Proposed → Accepted → (Superseded | Deprecated)
 ## Quality Gates
 
 Each ADR must pass:
+
 - [ ] Follows template exactly
 - [ ] Sequential numbering (no gaps)
 - [ ] All required metadata fields present
@@ -63,6 +64,7 @@ Each ADR must pass:
 ## Metadata
 
 ---
+
 title: GiX-Coder ADR Index
 type: adr
 phase: 00

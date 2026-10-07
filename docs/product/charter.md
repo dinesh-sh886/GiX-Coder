@@ -27,6 +27,7 @@ Provide a production-grade, secure, and auditable platform for AI-assisted softw
 ## Key Capabilities
 
 ### Phase 00 (Current) - Governance Foundation
+
 - Engineering governance framework
 - Architecture baseline
 - CI/CD pipeline
@@ -34,6 +35,7 @@ Provide a production-grade, secure, and auditable platform for AI-assisted softw
 - Documentation standards
 
 ### Phase 01 - Agent Gateway & Execution Sandbox
+
 - Agent Gateway service
 - Isolated execution sandbox
 - Context + Policy + Model Router
@@ -41,18 +43,21 @@ Provide a production-grade, secure, and auditable platform for AI-assisted softw
 - MCP integration
 
 ### Phase 02 - Durable Workflows & Agent Harness
+
 - Durable workflow engine
 - Agent harness framework
 - Long-running task support
 - Checkpointing and recovery
 
 ### Phase 03 - Developer Interfaces
+
 - CLI interface
 - IDE integration
 - Web dashboard
 - API gateway
 
 ### Phase 04 - Multi-tenancy & Platform Features
+
 - Tenant isolation
 - RBAC
 - Audit logging
@@ -87,6 +92,7 @@ Provide a production-grade, secure, and auditable platform for AI-assisted softw
 ## Metadata
 
 ---
+
 title: GiX-Coder Product Charter
 type: product
 phase: 00

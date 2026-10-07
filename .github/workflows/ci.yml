@@ -8,13 +8,13 @@ on:
       - develop
       - stage
       - main
-      - 'feature/**'
-      - 'fix/**'
-      - 'refactor/**'
-      - 'chore/**'
-      - 'docs/**'
-      - 'test/**'
-      - 'security/**'
+      - "feature/**"
+      - "fix/**"
+      - "refactor/**"
+      - "chore/**"
+      - "docs/**"
+      - "test/**"
+      - "security/**"
   pull_request:
     branches:
       - develop
@@ -22,12 +22,12 @@ on:
       - main
   schedule:
     # Nightly full test suite
-    - cron: '0 2 * * *'
+    - cron: "0 2 * * *"
   workflow_dispatch:
 
 env:
-  GO_VERSION: '1.22'
-  NODE_VERSION: '20'
+  GO_VERSION: "1.25"
+  NODE_VERSION: "20"
   DOCKER_REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
@@ -55,7 +55,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Tools
         run: make install-tools
@@ -139,7 +139,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: "npm"
 
       - name: Run Unit Tests (Go)
         run: make test-unit-go
@@ -195,7 +195,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: "npm"
 
       - name: Secret Scan
         uses: trufflesecurity/trufflehog@v3

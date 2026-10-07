@@ -272,18 +272,18 @@ docs/
 
 ## Naming Conventions
 
-| Artifact | Convention |
-|----------|------------|
-| Directories | kebab-case |
-| Go packages | lowercase, single word preferred |
-| Go files | snake_case.go |
-| Proto files | snake_case.proto |
-| Config files | service-name.yaml |
-| Dockerfiles | Dockerfile (no extension) |
-| Makefiles | Makefile |
-| Scripts | verb-noun.sh |
-| ADRs | NNNN-short-description.md |
-| Issue templates | type-description.yml |
+| Artifact        | Convention                       |
+| --------------- | -------------------------------- |
+| Directories     | kebab-case                       |
+| Go packages     | lowercase, single word preferred |
+| Go files        | snake_case.go                    |
+| Proto files     | snake_case.proto                 |
+| Config files    | service-name.yaml                |
+| Dockerfiles     | Dockerfile (no extension)        |
+| Makefiles       | Makefile                         |
+| Scripts         | verb-noun.sh                     |
+| ADRs            | NNNN-short-description.md        |
+| Issue templates | type-description.yml             |
 
 ---
 
@@ -299,6 +299,7 @@ docs/
 ## Metadata
 
 ---
+
 title: GiX-Coder Repository Structure
 type: architecture
 phase: 00

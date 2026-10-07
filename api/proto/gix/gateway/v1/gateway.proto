@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package gix.gateway.v1;
+
+option go_package = "github.com/gix-coder/gix-coder/api/proto/gix/gateway/v1;gatewayv1";
+
+import "api/proto/gix/shared/v1/common.proto";
+import "api/proto/gix/workflow/v1/workflow.proto";
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+service GatewayService {
+  rpc ExecuteWorkflow(ExecuteWorkflowRequest) returns (ExecuteWorkflowResponse) {
+    option (google.api.http) = {
+      post: "/workflows/execute"
+      body: "*"
+    };
+  }
+  
+  rpc GetExecution(GetExecutionRequest) returns (GetExecutionResponse) {
+    option (google.api.http) = {
+      get: "/workflows/{execution_id}"
+    };
+  }
+  
+  rpc CancelExecution(CancelExecutionRequest) returns (CancelExecutionResponse) {
+    option (google.api.http) = {
+      post: "/workflows/{execution_id}:cancel"
+      body: "*"
+    };
+  }
+  
+  rpc HealthLive(HealthLiveRequest) returns (HealthLiveResponse) {
+    option (google.api.http) = {
+      get: "/health/live"
+    };
+  }
+  rpc HealthReady(HealthReadyRequest) returns (HealthReadyResponse) {
+    option (google.api.http) = {
+      get: "/health/ready"
+    };
+  }
+}
+
+message ExecuteWorkflowRequest {
+  string workflow_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  gix.workflow.v1.WorkflowDefinition workflow = 2;
+  map<string, string> input = 3;
+  repeated gix.shared.v1.CapabilityGrantRequest capabilities = 4;
+  string idempotency_key = 5 [
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message ExecuteWorkflowResponse {
+  string execution_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string status = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  string error_code = 3 [
+    (buf.validate.field).string.max_len = 64
+  ];
+  string error_message = 4 [
+    (buf.validate.field).string.max_len = 512
+  ];
+  map<string, string> result = 5;
+}
+
+message GetExecutionRequest {
+  string execution_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message GetExecutionResponse {
+  gix.gateway.v1.ExecutionRecord execution = 1;
+}
+
+message CancelExecutionRequest {
+  string execution_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message CancelExecutionResponse {
+  bool success = 1;
+  string message = 2 [
+    (buf.validate.field).string.max_len = 256
+  ];
+}
+
+message ExecutionRecord {
+  string execution_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string workflow_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string workflow_type = 3 [
+    (buf.validate.field).string.max_len = 64
+  ];
+  string status = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  map<string, string> input = 5;
+  map<string, string> output = 6;
+  string error_code = 7 [
+    (buf.validate.field).string.max_len = 64
+  ];
+  string error_message = 8 [
+    (buf.validate.field).string.max_len = 512
+  ];
+  int64 started_at = 9 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  int64 completed_at = 10 [
+    (buf.validate.field).int64.gte = 0
+  ];
+  string correlation_id = 11 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string tenant_id = 12 [
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message HealthLiveRequest {}
+
+message HealthLiveResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+}
+
+message HealthReadyRequest {}
+
+message HealthReadyResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  repeated gix.shared.v1.HealthCheck checks = 2;
+}

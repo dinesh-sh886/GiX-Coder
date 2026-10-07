@@ -1,0 +1,26 @@
+{
+  "research_date": "2026-10-07",
+  "documents": [
+    "00_INDEX.md",
+    "01_COMPARATIVE.md",
+    "02_OPENCODE.md",
+    "03_OPENCLAW.md",
+    "04_CLAUDE_CODE.md",
+    "05_CODEX.md",
+    "06_OPENHANDS.md",
+    "07_TARGET_PRODUCT_PRD.md",
+    "08_SYSTEM_ARCHITECTURE.md",
+    "09_SECURITY_MULTI_TENANCY.md",
+    "10_MONETIZATION_ANALYTICS.md",
+    "11_ROADMAP.md",
+    "12_ARCHITECTURAL_DECISIONS.md"
+  ],
+  "scope": [
+    "OpenCode",
+    "OpenClaw",
+    "Claude Code",
+    "OpenAI Codex",
+    "OpenHands",
+    "Proposed SaaS"
+  ]
+}

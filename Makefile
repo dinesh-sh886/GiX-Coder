@@ -1,12 +1,12 @@
 # GiX-Coder Makefile
-# Governance-level Makefile for Phase 00 - no application implementation yet
-# All targets are designed to be executable in CI without application code
+# Phase 01 M0 - Foundation implementation
+# All targets are designed to be executable in CI
 
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 
 # Tool versions
-GO_VERSION := 1.22
+GO_VERSION := 1.25
 NODE_VERSION := 20
 GOFUMPT_VERSION := v0.6.0
 GOLANGCI_LINT_VERSION := v1.61.0
@@ -26,16 +26,21 @@ COSIGN_VERSION := 2.2.4
 MARKDOWNLINT_VERSION := 0.39.0
 MARKDOWN_LINK_CHECK_VERSION := 3.12.2
 CSPELL_VERSION := 8.11.0
+MIGRATE_VERSION := v4.17.1
+MOCKERY_VERSION := v2.42.1
 
 # Directories
 ROOT_DIR := $(shell pwd)
 DOCS_DIR := $(ROOT_DIR)/docs
 ARCH_DIR := $(DOCS_DIR)/architecture
+MODULES_DIR := $(ROOT_DIR)
 
-# Go toolchain (will be installed in CI)
+# Go toolchain
 GO := go
 GOFUMPT := gofumpt
 GOLANGCI_LINT := golangci-lint
+MOCKERY := mockery
+MIGRATE := migrate
 
 # Node toolchain
 NPM := npm
@@ -50,7 +55,7 @@ NC := \033[0m # No Color
 
 .PHONY: help
 help: ## Show this help message
-	@echo "GiX-Coder Makefile - Phase 00 Governance Targets"
+	@echo "GiX-Coder Makefile - Phase 01 M0 Foundation Targets"
 	@echo ""
 	@echo "Usage: make <target>"
 	@echo ""
@@ -68,6 +73,8 @@ install-tools: ## Install all required development tools
 	@which $(GOLANGCI_LINT) >/dev/null 2>&1 || $(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
 	@which govulncheck >/dev/null 2>&1 || $(GO) install golang.org/x/vuln/cmd/govulncheck@$(GOVULNCHECK_VERSION)
 	@which buf >/dev/null 2>&1 || $(GO) install github.com/bufbuild/buf/cmd/buf@$(BUF_VERSION)
+	@which $(MIGRATE) >/dev/null 2>&1 || $(GO) install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@$(MIGRATE_VERSION)
+	@which $(MOCKERY) >/dev/null 2>&1 || $(GO) install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
 	@echo "$(BLUE)Installing Node.js tools...$(NC)"
 	@which prettier >/dev/null 2>&1 || $(NPM) install -g prettier@$(PRETTIER_VERSION)
 	@which eslint >/dev/null 2>&1 || $(NPM) install -g eslint@$(ESLINT_VERSION)
@@ -79,11 +86,62 @@ install-tools: ## Install all required development tools
 	@which trufflehog >/dev/null 2>&1 || $(NPM) install -g trufflehog@$(TRUFFLEHOG_VERSION)
 	@which osv-scanner >/dev/null 2>&1 || $(NPM) install -g @google/osv-scanner@$(OSV_SCANNER_VERSION)
 	@which license-checker >/dev/null 2>&1 || $(NPM) install -g license-checker@$(LICENSE_CHECKER_VERSION)
+	@which hadolint >/dev/null 2>&1 || $(NPM) install -g hadolint@$(HADOLINT_VERSION)
+	@which trivy >/dev/null 2>&1 || curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin $(TRIVY_VERSION)
+	@which syft >/dev/null 2>&1 || $(GO) install github.com/anchore/syft/cmd/syft@$(SYFT_VERSION)
+	@which cosign >/dev/null 2>&1 || $(GO) install github.com/sigstore/cosign/v2/cmd/cosign@$(COSIGN_VERSION)
 	@echo "$(GREEN)All tools installed$(NC)"
+
+# =============================================================================
+# MODULE INITIALIZATION
+# =============================================================================
+
+.PHONY: mod-init
+mod-init: ## Initialize all Go modules
+	@echo "$(BLUE)Initializing Go modules...$(NC)"
+	@for mod in gateway workflow harness sandbox router policy audit shared api; do \
+		if [ ! -f "$$mod/go.mod" ]; then \
+			echo "Initializing $$mod..."; \
+			cd $$mod && $(GO) mod init github.com/gix-coder/gix-coder/$$mod && cd ..; \
+		else \
+			echo "$$mod already initialized"; \
+		fi; \
+	done
+	@echo "$(GREEN)All modules initialized$(NC)"
+
+.PHONY: mod-tidy
+mod-tidy: ## Run go mod tidy for all modules
+	@echo "$(BLUE)Running go mod tidy for all modules...$(NC)"
+	@$(GO) mod tidy
+	@for mod in gateway workflow harness sandbox router policy audit shared api; do \
+		if [ -f "$$mod/go.mod" ]; then \
+			echo "Tidying $$mod..."; \
+			cd $$mod && $(GO) mod tidy && cd ..; \
+		fi; \
+	done
+	@echo "$(GREEN)All modules tidied$(NC)"
+
+.PHONY: mod-verify
+mod-verify: ## Verify all Go modules
+	@echo "$(BLUE)Verifying Go modules...$(NC)"
+	@$(GO) mod verify
+	@for mod in gateway workflow harness sandbox router policy audit shared api; do \
+		if [ -f "$$mod/go.mod" ]; then \
+			echo "Verifying $$mod..."; \
+			cd $$mod && $(GO) mod verify && cd ..; \
+		fi; \
+	done
+	@echo "$(GREEN)All modules verified$(NC)"
 
 # =============================================================================
 # FORMAT CHECKS
 # =============================================================================
+
+.PHONY: fmt
+fmt: ## Format all Go code with gofumpt
+	@echo "$(BLUE)Formatting Go code...$(NC)"
+	@$(GOFUMPT) -w .
+	@echo "$(GREEN)Go formatting complete$(NC)"
 
 .PHONY: fmt-check
 fmt-check: ## Check Go formatting with gofumpt (strict)
@@ -98,7 +156,7 @@ fmt-check: ## Check Go formatting with gofumpt (strict)
 .PHONY: fmt-check-ts
 fmt-check-ts: ## Check TypeScript/Markdown/JSON/YAML formatting with prettier
 	@echo "$(BLUE)Checking TypeScript/Markdown/JSON/YAML formatting...$(NC)"
-	@if ! $(NPX) prettier --check . --ignore-path .gitignore 2>/dev/null; then \
+	@if ! $(NPX) prettier --check . --ignore-path .prettierignore 2>/dev/null; then \
 		echo "$(RED)Files not formatted with prettier$(NC)"; \
 		exit 1; \
 	fi
@@ -112,7 +170,7 @@ fmt-check-ts: ## Check TypeScript/Markdown/JSON/YAML formatting with prettier
 lint-go: ## Lint Go code with golangci-lint
 	@echo "$(BLUE)Linting Go code...$(NC)"
 	@if [ ! -f "go.mod" ]; then \
-		echo "$(YELLOW)No go.mod found, skipping Go lint (no Go modules yet)$(NC)"; \
+		echo "$(YELLOW)No go.mod found, skipping Go lint$(NC)"; \
 		exit 0; \
 	fi
 	@$(GOLANGCI_LINT) run --timeout=5m ./...
@@ -166,6 +224,78 @@ generate: ## Generate code (protobuf, mocks, etc.)
 	@buf generate
 	@echo "$(GREEN)Code generation completed$(NC)"
 
+.PHONY: generate-mocks
+generate-mocks: ## Generate mocks with mockery
+	@echo "$(BLUE)Generating mocks...$(NC)"
+	@if [ ! -f "$(MOCKERY)" ]; then \
+		echo "$(YELLOW)mockery not installed, skipping$(NC)"; \
+		exit 0; \
+	fi
+	@$(MOCKERY) --all --output=./mocks --outpkg=mocks --recursive --with-expecter --filename="{{.InterfaceName}}_mock.go" --structname="Mock{{.InterfaceName}}" --inpackage --disable-version-string
+	@echo "$(GREEN)Mock generation completed$(NC)"
+
+# =============================================================================
+# DATABASE MIGRATIONS
+# =============================================================================
+
+.PHONY: migrate-up
+migrate-up: ## Run database migrations up
+	@echo "$(BLUE)Running database migrations up...$(NC)"
+	@if [ -z "$(DATABASE_URL)" ]; then \
+		echo "$(RED)DATABASE_URL not set$(NC)"; \
+		exit 1; \
+	fi
+	@for mod in gateway workflow router policy audit shared; do \
+		if [ -d "$$mod/migrations" ]; then \
+			echo "Running migrations for $$mod..."; \
+			$(MIGRATE) -path $$mod/migrations -database "$(DATABASE_URL)" up; \
+		fi; \
+	done
+	@echo "$(GREEN)All migrations completed$(NC)"
+
+.PHONY: migrate-down
+migrate-down: ## Run database migrations down
+	@echo "$(BLUE)Running database migrations down...$(NC)"
+	@if [ -z "$(DATABASE_URL)" ]; then \
+		echo "$(RED)DATABASE_URL not set$(NC)"; \
+		exit 1; \
+	fi
+	@for mod in gateway workflow router policy audit shared; do \
+		if [ -d "$$mod/migrations" ]; then \
+			echo "Rolling back migrations for $$mod..."; \
+			$(MIGRATE) -path $$mod/migrations -database "$(DATABASE_URL)" down; \
+		fi; \
+	done
+	@echo "$(GREEN)All rollbacks completed$(NC)"
+
+.PHONY: migrate-version
+migrate-version: ## Show current migration version
+	@echo "$(BLUE)Checking migration versions...$(NC)"
+	@if [ -z "$(DATABASE_URL)" ]; then \
+		echo "$(RED)DATABASE_URL not set$(NC)"; \
+		exit 1; \
+	fi
+	@for mod in gateway workflow router policy audit shared; do \
+		if [ -d "$$mod/migrations" ]; then \
+			echo "Version for $$mod:"; \
+			$(MIGRATE) -path $$mod/migrations -database "$(DATABASE_URL)" version; \
+		fi; \
+	done
+
+.PHONY: migrate-create
+migrate-create: ## Create a new migration (usage: make migrate-create NAME=add_users_table)
+	@echo "$(BLUE)Creating new migration...$(NC)"
+	@if [ -z "$(NAME)" ]; then \
+		echo "$(RED)NAME parameter required$(NC)"; \
+		exit 1; \
+	fi
+	@for mod in gateway workflow router policy audit shared; do \
+		if [ -d "$$mod/migrations" ]; then \
+			$(MIGRATE) create -ext sql -dir $$mod/migrations -seq $(NAME); \
+		fi; \
+	done
+	@echo "$(GREEN)Migration files created$(NC)"
+
 # =============================================================================
 # UNIT TESTS
 # =============================================================================
@@ -174,7 +304,7 @@ generate: ## Generate code (protobuf, mocks, etc.)
 test-unit-go: ## Run Go unit tests with coverage
 	@echo "$(BLUE)Running Go unit tests...$(NC)"
 	@if [ ! -f "go.mod" ]; then \
-		echo "$(YELLOW)No go.mod found, skipping Go unit tests (no Go modules yet)$(NC)"; \
+		echo "$(YELLOW)No go.mod found, skipping Go unit tests$(NC)"; \
 		exit 0; \
 	fi
 	@$(GO) test -race -coverprofile=coverage/go.out -covermode=atomic ./... 2>&1 | tee /tmp/go-test.log
@@ -195,6 +325,9 @@ test-unit-ts: ## Run TypeScript unit tests with coverage
 	@$(NPX) vitest run --coverage 2>&1 | tee /tmp/ts-test.log
 	@echo "$(GREEN)TypeScript unit tests passed$(NC)"
 
+.PHONY: test-unit
+test-unit: test-unit-go test-unit-ts ## Run all unit tests
+
 # =============================================================================
 # INTEGRATION TESTS
 # =============================================================================
@@ -202,10 +335,34 @@ test-unit-ts: ## Run TypeScript unit tests with coverage
 .PHONY: test-integration
 test-integration: ## Run integration tests (requires infrastructure)
 	@echo "$(BLUE)Running integration tests...$(NC)"
-	@echo "$(YELLOW)Integration tests require application implementation$(NC)"
-	@echo "$(YELLOW)Phase 00 is governance-only - no application code exists$(NC)"
-	@echo "$(YELLOW)Skipping integration tests for Phase 00$(NC)"
-	@exit 0
+	@echo "$(YELLOW)Integration tests require infrastructure$(NC)"
+	@if [ -f "test/go.mod" ]; then \
+		cd test && $(GO) test -v ./integration/...; \
+	else \
+		echo "$(YELLOW)Test module not found, skipping$(NC)"; \
+	fi
+
+# =============================================================================
+# ARCHITECTURE TESTS
+# =============================================================================
+
+.PHONY: test-architecture
+test-architecture: ## Run architecture tests (import boundaries, cyclic deps, layer violations)
+	@echo "$(BLUE)Running architecture tests...$(NC)"
+	@if [ -f "test/architecture/import_rules_test.go" ]; then \
+		$(GO) test -v ./test/architecture/... -run "TestNoForbiddenImports|TestNoCrossModuleInternalImports|TestNoCycles|TestSharedPackageNoExternalDeps"; \
+	else \
+		echo "$(YELLOW)Architecture tests not found, skipping$(NC)"; \
+	fi
+
+.PHONY: test-layer-rules
+test-layer-rules: ## Run layer boundary tests
+	@echo "$(BLUE)Running layer boundary tests...$(NC)"
+	@if [ -f "test/architecture/layer_rules_test.go" ]; then \
+		$(GO) test -v ./test/architecture/... -run "TestLayerViolations|TestNoDirectDatabaseAccess|TestNoHTTPCallsOutsideGateway|TestNoSQLInApplicationLayer"; \
+	else \
+		echo "$(YELLOW)Layer rules tests not found, skipping$(NC)"; \
+	fi
 
 # =============================================================================
 # CONTRACT TESTS
@@ -215,20 +372,7 @@ test-integration: ## Run integration tests (requires infrastructure)
 test-contract: ## Run contract tests (Pact/Schemathesis)
 	@echo "$(BLUE)Running contract tests...$(NC)"
 	@echo "$(YELLOW)Contract tests require API definitions and provider/consumer setup$(NC)"
-	@echo "$(YELLOW)Phase 00 is governance-only - no API contracts exist yet$(NC)"
-	@echo "$(YELLOW)Skipping contract tests for Phase 00$(NC)"
-	@exit 0
-
-# =============================================================================
-# ARCHITECTURE TESTS
-# =============================================================================
-
-.PHONY: test-architecture
-test-architecture: ## Run architecture tests (import boundaries, cyclic deps, layer violations)
-	@echo "$(BLUE)Running architecture tests...$(NC)"
-	@echo "$(YELLOW)Architecture tests require Go modules with internal/ packages$(NC)"
-	@echo "$(YELLOW)Phase 00 is governance-only - no Go application modules exist$(NC)"
-	@echo "$(YELLOW)Skipping architecture tests for Phase 00$(NC)"
+	@echo "$(YELLOW)Skipping contract tests for M0$(NC)"
 	@exit 0
 
 # =============================================================================
@@ -255,6 +399,21 @@ security-scan-ts: ## Security scan TypeScript dependencies with osv-scanner
 	@osv-scanner --lockfile=package-lock.json . 2>/dev/null || osv-scanner . 2>/dev/null || true
 	@echo "$(GREEN)TypeScript vulnerability scan completed$(NC)"
 
+.PHONY: security-scan
+security-scan: security-scan-go security-scan-ts ## Run all security scans
+
+.PHONY: secret-scan
+secret-scan: ## Scan for secrets with trufflehog
+	@echo "$(BLUE)Scanning for secrets...$(NC)"
+	@trufflehog filesystem --no-verification --fail . 2>/dev/null || true
+	@echo "$(GREEN)Secret scan completed$(NC)"
+
+.PHONY: gosec
+gosec: ## Run gosec security linter
+	@echo "$(BLUE)Running gosec...$(NC)"
+	@gosec -config .gosec.json ./...
+	@echo "$(GREEN)gosec completed$(NC)"
+
 .PHONY: license-check
 license-check: ## Check license compliance for all dependencies
 	@echo "$(BLUE)Checking license compliance...$(NC)"
@@ -279,7 +438,7 @@ container-scan: ## Scan container images for vulnerabilities
 		echo "$(YELLOW)trivy not installed, installing...$(NC)"; \
 		curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin $(TRIVY_VERSION); \
 	fi
-	@echo "$(YELLOW)No container images built yet in Phase 00$(NC)"
+	@echo "$(YELLOW)No container images built yet in M0$(NC)"
 	@echo "$(YELLOW)Scanning Dockerfile if present...$(NC)"
 	@if [ -f "Dockerfile" ]; then \
 		trivy fs --security-checks config .; \
@@ -292,122 +451,34 @@ container-scan: ## Scan container images for vulnerabilities
 # BUILD VERIFICATION
 # =============================================================================
 
+.PHONY: build
+build: ## Build all modules
+	@echo "$(BLUE)Building all modules...$(NC)"
+	@for mod in gateway workflow harness sandbox router policy audit shared api; do \
+		if [ -f "$$mod/go.mod" ]; then \
+			echo "Building $$mod..."; \
+			cd $$mod && $(GO) build -v ./... && cd ..; \
+		fi; \
+	done
+	@echo "$(GREEN)All modules built$(NC)"
+
 .PHONY: verify-reproducible-build
 verify-reproducible-build: ## Verify build reproducibility
 	@echo "$(BLUE)Verifying reproducible build...$(NC)"
-	@echo "$(YELLOW)No build artifacts exist in Phase 00$(NC)"
+	@echo "$(YELLOW)No build artifacts exist in M0$(NC)"
 	@echo "$(YELLOW)Skipping reproducible build verification$(NC)"
 	@exit 0
 
 # =============================================================================
-# DEPLOYMENT TARGETS (Phase 00: governance only - no actual deployment)
+# PROTOBUF/API COMPATIBILITY
 # =============================================================================
-
-.PHONY: deploy-dev
-deploy-dev: ## Deploy to DEV environment (governance check only)
-	@echo "$(BLUE)DEV deployment check...$(NC)"
-	@echo "$(YELLOW)Phase 00: No application to deploy$(NC)"
-	@echo "$(YELLOW)Verifying DEV environment configuration exists...$(NC)"
-	@if [ -d "$(DOCS_DIR)/architecture" ] && [ -f "$(ARCH_DIR)/environment-strategy.md" ]; then \
-		echo "$(GREEN)DEV environment strategy documented$(NC)"; \
-	else \
-		echo "$(RED)DEV environment strategy not documented$(NC)"; \
-		exit 1; \
-	fi
-	@echo "$(GREEN)DEV deployment governance check passed$(NC)"
-
-.PHONY: smoke-test-dev
-smoke-test-dev: ## Run smoke tests against DEV (governance check)
-	@echo "$(BLUE)DEV smoke tests...$(NC)"
-	@echo "$(YELLOW)Phase 00: No application deployed to test$(NC)"
-	@echo "$(YELLOW)Skipping smoke tests for Phase 00$(NC)"
-	@exit 0
-
-.PHONY: deploy-stage
-deploy-stage: ## Deploy to STAGE environment (governance check)
-	@echo "$(BLUE)STAGE deployment check...$(NC)"
-	@echo "$(YELLOW)Phase 00: No application to deploy$(NC)"
-	@echo "$(YELLOW)Verifying STAGE environment configuration exists...$(NC)"
-	@if [ -f "$(ARCH_DIR)/environment-strategy.md" ]; then \
-		echo "$(GREEN)STAGE environment strategy documented$(NC)"; \
-	else \
-		echo "$(RED)STAGE environment strategy not documented$(NC)"; \
-		exit 1; \
-	fi
-	@echo "$(GREEN)STAGE deployment governance check passed$(NC)"
-
-.PHONY: test-e2e-stage
-test-e2e-stage: ## Run E2E tests against STAGE
-	@echo "$(BLUE)STAGE E2E tests...$(NC)"
-	@echo "$(YELLOW)Phase 00: No application deployed$(NC)"
-	@echo "$(YELLOW)Skipping E2E tests for Phase 00$(NC)"
-	@exit 0
-
-.PHONY: perf-test-stage
-perf-test-stage: ## Run performance tests against STAGE
-	@echo "$(BLUE)STAGE performance tests...$(NC)"
-	@echo "$(YELLOW)Phase 00: No application deployed$(NC)"
-	@echo "$(YELLOW)Skipping performance tests for Phase 00$(NC)"
-	@exit 0
-
-.PHONY: verify-image-signature
-verify-image-signature: ## Verify container image signatures
-	@echo "$(BLUE)Verifying image signatures...$(NC)"
-	@echo "$(YELLOW)No container images built in Phase 00$(NC)"
-	@echo "$(YELLOW)Skipping image signature verification$(NC)"
-	@exit 0
-
-.PHONY: deploy-prod-canary
-deploy-prod-canary: ## Deploy to PROD with canary (governance check)
-	@echo "$(BLUE)PROD canary deployment check...$(NC)"
-	@echo "$(YELLOW)Phase 00: No application to deploy$(NC)"
-	@echo "$(YELLOW)Verifying PROD environment configuration exists...$(NC)"
-	@if [ -f "$(ARCH_DIR)/environment-strategy.md" ]; then \
-		echo "$(GREEN)PROD environment strategy documented$(NC)"; \
-	else \
-		echo "$(RED)PROD environment strategy not documented$(NC)"; \
-		exit 1; \
-	fi
-	@echo "$(GREEN)PROD deployment governance check passed$(NC)"
-
-.PHONY: verify-prod
-verify-prod: ## Post-deploy verification for PROD
-	@echo "$(BLUE)PROD post-deploy verification...$(NC)"
-	@echo "$(YELLOW)Phase 00: No application deployed$(NC)"
-	@echo "$(YELLOW)Skipping PROD verification$(NC)"
-	@exit 0
-
-.PHONY: release-notes
-release-notes: ## Generate release notes
-	@echo "$(BLUE)Generating release notes...$(NC)"
-	@if command -v git-cliff >/dev/null 2>&1; then \
-		git-cliff --output CHANGELOG.md; \
-	else \
-		echo "$(YELLOW)git-cliff not installed, generating basic changelog from conventional commits$(NC)"; \
-		git log --oneline --pretty=format:"- %s (%h)" -20 > CHANGELOG.md 2>/dev/null || echo "# Changelog\n\nNo commits yet" > CHANGELOG.md; \
-	fi
-	@echo "$(GREEN)Release notes generated$(NC)"
-
-# =============================================================================
-# ADDITIONAL QUALITY GATES (from ci-cd-strategy.md)
-# =============================================================================
-
-.PHONY: race-detection
-race-detection: ## Run Go tests with race detector
-	@echo "$(BLUE)Running Go tests with race detector...$(NC)"
-	@if [ ! -f "go.mod" ]; then \
-		echo "$(YELLOW)No go.mod found, skipping race detection$(NC)"; \
-		exit 0; \
-	fi
-	@$(GO) test -race -count=1 ./... 2>&1 | tee /tmp/race-test.log
-	@echo "$(GREEN)Race detection passed$(NC)"
 
 .PHONY: protobuf-compat
 protobuf-compat: ## Check protobuf compatibility (buf breaking)
 	@echo "$(BLUE)Checking protobuf compatibility...$(NC)"
 	@if [ ! -f "buf.yaml" ]; then \
 		echo "$(YELLOW)No buf.yaml found, skipping protobuf compatibility check$(NC)"; \
-		echo "$(YELLOW)This gate will be enforced when protobuf contracts are added in Phase 01$(NC)"; \
+		echo "$(YELLOW)This gate will be enforced when protobuf contracts are added in M1$(NC)"; \
 		exit 0; \
 	fi
 	@buf breaking --against '.git#branch=main' 2>/dev/null || true
@@ -418,7 +489,7 @@ api-compat: ## Check API compatibility (breaking changes)
 	@echo "$(BLUE)Checking API compatibility...$(NC)"
 	@if [ ! -f "buf.yaml" ] && [ ! -f "openapi.yaml" ]; then \
 		echo "$(YELLOW)No API definitions found, skipping API compatibility check$(NC)"; \
-		echo "$(YELLOW)This gate will be enforced when API contracts are added in Phase 01$(NC)"; \
+		echo "$(YELLOW)This gate will be enforced when API contracts are added in M1$(NC)"; \
 		exit 0; \
 	fi
 	@echo "$(GREEN)API compatibility check passed$(NC)"
@@ -428,10 +499,14 @@ api-docs-check: ## Verify public API documentation exists
 	@echo "$(BLUE)Checking public API documentation...$(NC)"
 	@if [ ! -f "buf.yaml" ] && [ ! -f "openapi.yaml" ]; then \
 		echo "$(YELLOW)No API definitions found, skipping API docs check$(NC)"; \
-		echo "$(YELLOW)This gate will be enforced when API contracts are added in Phase 01$(NC)"; \
+		echo "$(YELLOW)This gate will be enforced when API contracts are added in M1$(NC)"; \
 		exit 0; \
 	fi
 	@echo "$(GREEN)API documentation check passed$(NC)"
+
+# =============================================================================
+# DOCUMENTATION CHECKS
+# =============================================================================
 
 .PHONY: readme-check
 readme-check: ## Verify README.md exists and is non-empty
@@ -481,16 +556,147 @@ spell-check: ## Check spelling in documentation
 		$(NPX) cspell "**/*.md" --no-progress 2>/dev/null || true
 	@echo "$(GREEN)Spell check completed$(NC)"
 
-# =============================================================================
-# DOCUMENTATION VALIDATION
-# =============================================================================
-
 .PHONY: validate-docs
 validate-docs: markdown-lint markdown-link-check spell-check readme-check changelog-check ## Run all documentation validation checks
 	@echo "$(GREEN)All documentation validation checks passed$(NC)"
 
 # =============================================================================
-# FULL CI PIPELINE SIMULATION
+# DEPLOYMENT TARGETS (M0: governance only - no actual deployment)
+# =============================================================================
+
+.PHONY: deploy-dev
+deploy-dev: ## Deploy to DEV environment (governance check only)
+	@echo "$(BLUE)DEV deployment check...$(NC)"
+	@echo "$(YELLOW)M0: No application to deploy$(NC)"
+	@echo "$(YELLOW)Verifying DEV environment configuration exists...$(NC)"
+	@if [ -d "$(DOCS_DIR)/architecture" ] && [ -f "$(ARCH_DIR)/environment-strategy.md" ]; then \
+		echo "$(GREEN)DEV environment strategy documented$(NC)"; \
+	else \
+		echo "$(RED)DEV environment strategy not documented$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)DEV deployment governance check passed$(NC)"
+
+.PHONY: smoke-test-dev
+smoke-test-dev: ## Run smoke tests against DEV (governance check)
+	@echo "$(BLUE)DEV smoke tests...$(NC)"
+	@echo "$(YELLOW)M0: No application deployed to test$(NC)"
+	@echo "$(YELLOW)Skipping smoke tests for M0$(NC)"
+	@exit 0
+
+.PHONY: deploy-stage
+deploy-stage: ## Deploy to STAGE environment (governance check)
+	@echo "$(BLUE)STAGE deployment check...$(NC)"
+	@echo "$(YELLOW)M0: No application to deploy$(NC)"
+	@echo "$(YELLOW)Verifying STAGE environment configuration exists...$(NC)"
+	@if [ -f "$(ARCH_DIR)/environment-strategy.md" ]; then \
+		echo "$(GREEN)STAGE environment strategy documented$(NC)"; \
+	else \
+		echo "$(RED)STAGE environment strategy not documented$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)STAGE deployment governance check passed$(NC)"
+
+.PHONY: test-e2e-stage
+test-e2e-stage: ## Run E2E tests against STAGE
+	@echo "$(BLUE)STAGE E2E tests...$(NC)"
+	@echo "$(YELLOW)M0: No application deployed$(NC)"
+	@echo "$(YELLOW)Skipping E2E tests for M0$(NC)"
+	@exit 0
+
+.PHONY: perf-test-stage
+perf-test-stage: ## Run performance tests against STAGE
+	@echo "$(BLUE)STAGE performance tests...$(NC)"
+	@echo "$(YELLOW)M0: No application deployed$(NC)"
+	@echo "$(YELLOW)Skipping performance tests for M0$(NC)"
+	@exit 0
+
+.PHONY: verify-image-signature
+verify-image-signature: ## Verify container image signatures
+	@echo "$(BLUE)Verifying image signatures...$(NC)"
+	@echo "$(YELLOW)No container images built in M0$(NC)"
+	@echo "$(YELLOW)Skipping image signature verification$(NC)"
+	@exit 0
+
+.PHONY: deploy-prod-canary
+deploy-prod-canary: ## Deploy to PROD with canary (governance check)
+	@echo "$(BLUE)PROD canary deployment check...$(NC)"
+	@echo "$(YELLOW)M0: No application to deploy$(NC)"
+	@echo "$(YELLOW)Verifying PROD environment configuration exists...$(NC)"
+	@if [ -f "$(ARCH_DIR)/environment-strategy.md" ]; then \
+		echo "$(GREEN)PROD environment strategy documented$(NC)"; \
+	else \
+		echo "$(RED)PROD environment strategy not documented$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)PROD deployment governance check passed$(NC)"
+
+.PHONY: verify-prod
+verify-prod: ## Post-deploy verification for PROD
+	@echo "$(BLUE)PROD post-deploy verification...$(NC)"
+	@echo "$(YELLOW)M0: No application deployed$(NC)"
+	@echo "$(YELLOW)Skipping PROD verification$(NC)"
+	@exit 0
+
+.PHONY: release-notes
+release-notes: ## Generate release notes
+	@echo "$(BLUE)Generating release notes...$(NC)"
+	@if command -v git-cliff >/dev/null 2>&1; then \
+		git-cliff --output CHANGELOG.md; \
+	else \
+		echo "$(YELLOW)git-cliff not installed, generating basic changelog from conventional commits$(NC)"; \
+		git log --oneline --pretty=format:"- %s (%h)" -20 > CHANGELOG.md 2>/dev/null || echo "# Changelog\n\nNo commits yet" > CHANGELOG.md; \
+	fi
+	@echo "$(GREEN)Release notes generated$(NC)"
+
+# =============================================================================
+# ADDITIONAL QUALITY GATES (from ci-cd-strategy.md)
+# =============================================================================
+
+.PHONY: race-detection
+race-detection: ## Run Go tests with race detector
+	@echo "$(BLUE)Running Go tests with race detector...$(NC)"
+	@if [ ! -f "go.mod" ]; then \
+		echo "$(YELLOW)No go.mod found, skipping race detection$(NC)"; \
+		exit 0; \
+	fi
+	@$(GO) test -race -count=1 ./... 2>&1 | tee /tmp/race-test.log
+	@echo "$(GREEN)Race detection passed$(NC)"
+
+# =============================================================================
+# DOCKER/LOCAL DEVELOPMENT
+# =============================================================================
+
+.PHONY: docker-up
+docker-up: ## Start local development environment with docker-compose
+	@echo "$(BLUE)Starting local development environment...$(NC)"
+	@docker-compose up -d
+	@echo "$(GREEN)Local environment started$(NC)"
+
+.PHONY: docker-down
+docker-down: ## Stop local development environment
+	@echo "$(BLUE)Stopping local development environment...$(NC)"
+	@docker-compose down
+	@echo "$(GREEN)Local environment stopped$(NC)"
+
+.PHONY: docker-logs
+docker-logs: ## View docker-compose logs
+	@docker-compose logs -f
+
+.PHONY: docker-ps
+docker-ps: ## Show docker-compose status
+	@docker-compose ps
+
+.PHONY: dev-up
+dev-up: ## Start development environment (alias for docker-up)
+	@$(MAKE) docker-up
+
+.PHONY: dev-down
+dev-down: ## Stop development environment (alias for docker-down)
+	@$(MAKE) docker-down
+
+# =============================================================================
+# CI PIPELINE SIMULATION
 # =============================================================================
 
 .PHONY: ci-validate
@@ -519,6 +725,29 @@ clean: ## Clean build artifacts and caches
 	@rm -rf coverage dist build .turbo .vercel node_modules 2>/dev/null || true
 	@$(GO) clean -cache -modcache -testcache 2>/dev/null || true
 	@echo "$(GREEN)Cleanup completed$(NC)"
+
+.PHONY: clean-docker
+clean-docker: ## Clean docker resources
+	@echo "$(BLUE)Cleaning docker resources...$(NC)"
+	@docker-compose down -v 2>/dev/null || true
+	@docker system prune -f 2>/dev/null || true
+	@echo "$(GREEN)Docker cleanup completed$(NC)"
+
+# =============================================================================
+# M0 VALIDATION
+# =============================================================================
+
+.PHONY: m0-validate
+m0-validate: mod-tidy mod-verify fmt-check fmt-check-ts lint-go lint-ts typecheck-go typecheck-ts generate test-unit test-integration test-architecture test-layer-rules race-detection security-scan protobuf-compat api-compat api-docs-check readme-check changelog-check validate-docs ## Run complete M0 validation
+	@echo "$(GREEN)M0 validation complete$(NC)"
+
+.PHONY: m0-setup
+m0-setup: install-tools mod-init mod-tidy ## Set up M0 development environment
+	@echo "$(GREEN)M0 setup complete$(NC)"
+
+.PHONY: m0-clean
+m0-clean: clean clean-docker ## Clean M0 environment
+	@echo "$(GREEN)M0 cleanup complete$(NC)"
 
 # =============================================================================
 # DEFAULT TARGET
