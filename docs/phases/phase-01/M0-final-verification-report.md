@@ -14,49 +14,49 @@ All M0 validation gates have been successfully completed. The Go 1.25 toolchain 
 
 ## Toolchain Status
 
-| Tool | Version | Status |
-|------|---------|--------|
-| Go | 1.25.0 | ✅ Available |
-| Buf | 1.73.0 | ✅ Available |
-| golangci-lint | 1.64.0 (built with Go 1.26.8) | ⚠️ Typecheck has issues with Go 1.25 due to version mismatch; other linters work |
-| gosec | 2.21.0 | ⚠️ Internal error with prometheus/client_golang (typecheck context); works without typecheck |
-| trufflehog | 3.99.0 | ✅ Available, scan passes (0 secrets found) |
-| trivy | 0.75.0 | ✅ Available, scan passes (2 k8s misconfigurations in configmap.yaml) |
-| Docker | - | ❌ Not available in environment (BLOCKED_BY_ENVIRONMENT) |
+| Tool          | Version                       | Status                                                                                       |
+| ------------- | ----------------------------- | -------------------------------------------------------------------------------------------- |
+| Go            | 1.25.0                        | ✅ Available                                                                                 |
+| Buf           | 1.73.0                        | ✅ Available                                                                                 |
+| golangci-lint | 1.64.0 (built with Go 1.26.8) | ⚠️ Typecheck has issues with Go 1.25 due to version mismatch; other linters work             |
+| gosec         | 2.21.0                        | ⚠️ Internal error with prometheus/client_golang (typecheck context); works without typecheck |
+| trufflehog    | 3.99.0                        | ✅ Available, scan passes (0 secrets found)                                                  |
+| trivy         | 0.75.0                        | ✅ Available, scan passes (2 k8s misconfigurations in configmap.yaml)                        |
+| Docker        | -                             | ❌ Not available in environment (BLOCKED_BY_ENVIRONMENT)                                     |
 
 ---
 
 ## Protobuf/API Contract Verification
 
-| Check | Result | Evidence |
-|-------|--------|----------|
-| buf lint | ✅ PASS | 0 errors, 0 warnings |
-| buf build | ✅ PASS | |
-| buf generate | ✅ PASS | Deterministic |
-| Proto location | ✅ PASS | `api/proto/gix/*/v1/` |
-| buf.validate annotations | ✅ RESTORED | All request/response messages have validation rules |
-| OpenAPI generation | ✅ PASS | 8 specs at `api/openapi/gix/*.swagger.json` |
-| RPC response naming | ✅ FIXED | GetExecutionResponse, GetAgentStateResponse, GetSessionResponse |
-| Enum naming | ✅ FIXED | CAPABILITY_TYPE_* prefix on all 9 values |
-| Unused imports | ✅ REMOVED | gateway.proto imports cleaned |
-| HTTP annotations | ✅ ADDED | All RPCs have google.api.http options |
-| Deterministic generation | ✅ PASS | Re-run produces no changes |
+| Check                    | Result      | Evidence                                                        |
+| ------------------------ | ----------- | --------------------------------------------------------------- |
+| buf lint                 | ✅ PASS     | 0 errors, 0 warnings                                            |
+| buf build                | ✅ PASS     |                                                                 |
+| buf generate             | ✅ PASS     | Deterministic                                                   |
+| Proto location           | ✅ PASS     | `api/proto/gix/*/v1/`                                           |
+| buf.validate annotations | ✅ RESTORED | All request/response messages have validation rules             |
+| OpenAPI generation       | ✅ PASS     | 8 specs at `api/openapi/gix/*.swagger.json`                     |
+| RPC response naming      | ✅ FIXED    | GetExecutionResponse, GetAgentStateResponse, GetSessionResponse |
+| Enum naming              | ✅ FIXED    | CAPABILITY_TYPE_* prefix on all 9 values                        |
+| Unused imports           | ✅ REMOVED  | gateway.proto imports cleaned                                   |
+| HTTP annotations         | ✅ ADDED    | All RPCs have google.api.http options                           |
+| Deterministic generation | ✅ PASS     | Re-run produces no changes                                      |
 
 ---
 
 ## Module Validation Results
 
-| Module | go list | go build | go test | go vet | Status |
-|--------|---------|----------|---------|--------|--------|
-| api | ✅ 8 packages | ✅ PASS | NO_TESTS | ✅ PASS | ✅ PASS |
-| audit | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
-| gateway | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
-| harness | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
-| policy | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
-| router | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
-| sandbox | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
+| Module   | go list        | go build       | go test  | go vet         | Status   |
+| -------- | -------------- | -------------- | -------- | -------------- | -------- |
+| api      | ✅ 8 packages  | ✅ PASS        | NO_TESTS | ✅ PASS        | ✅ PASS  |
+| audit    | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
+| gateway  | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
+| harness  | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
+| policy   | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
+| router   | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
+| sandbox  | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
 | workflow | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_TESTS | NO_GO_PACKAGES | EXPECTED |
-| shared | ✅ 11 packages | ✅ PASS | NO_TESTS | ✅ PASS | ✅ PASS |
+| shared   | ✅ 11 packages | ✅ PASS        | NO_TESTS | ✅ PASS        | ✅ PASS  |
 
 **Note**: 7 of 9 modules have no Go source files yet (implementation begins in M1). Only `api` (generated code) and `shared` (hand-written utilities) have Go packages.
 
@@ -64,35 +64,35 @@ All M0 validation gates have been successfully completed. The Go 1.25 toolchain 
 
 ## Quality Gates
 
-| Gate | Result | Evidence |
-|------|--------|----------|
-| Go formatting (gofmt) | ✅ PASS | `make fmt-check` passes |
-| TypeScript/Markdown/JSON/YAML formatting | ✅ PASS | `make fmt-check-ts` passes (with .prettierignore) |
-| Buf lint | ✅ PASS | 0 errors, 0 warnings |
-| Buf build | ✅ PASS | |
-| Buf generate | ✅ PASS | Deterministic |
-| Go mod tidy | ✅ PASS | All modules |
-| Go mod verify | ✅ PASS | All modules |
-| Go build | ✅ PASS | api, shared |
-| Go vet | ✅ PASS | api, shared |
-| golangci-lint | ⚠️ PARTIAL | Typecheck disabled due to Go version mismatch; other linters pass |
-| gosec | ⚠️ BLOCKED | Internal error with prometheus/client_golang (typecheck context) |
-| trufflehog | ✅ PASS | 0 secrets found |
-| trivy | ✅ PASS | 2 k8s misconfigurations in configmap.yaml (non-blocking) |
-| Docker | ❌ BLOCKED_BY_ENVIRONMENT | Not available |
+| Gate                                     | Result                    | Evidence                                                          |
+| ---------------------------------------- | ------------------------- | ----------------------------------------------------------------- |
+| Go formatting (gofmt)                    | ✅ PASS                   | `make fmt-check` passes                                           |
+| TypeScript/Markdown/JSON/YAML formatting | ✅ PASS                   | `make fmt-check-ts` passes (with .prettierignore)                 |
+| Buf lint                                 | ✅ PASS                   | 0 errors, 0 warnings                                              |
+| Buf build                                | ✅ PASS                   |                                                                   |
+| Buf generate                             | ✅ PASS                   | Deterministic                                                     |
+| Go mod tidy                              | ✅ PASS                   | All modules                                                       |
+| Go mod verify                            | ✅ PASS                   | All modules                                                       |
+| Go build                                 | ✅ PASS                   | api, shared                                                       |
+| Go vet                                   | ✅ PASS                   | api, shared                                                       |
+| golangci-lint                            | ⚠️ PARTIAL                | Typecheck disabled due to Go version mismatch; other linters pass |
+| gosec                                    | ⚠️ BLOCKED                | Internal error with prometheus/client_golang (typecheck context)  |
+| trufflehog                               | ✅ PASS                   | 0 secrets found                                                   |
+| trivy                                    | ✅ PASS                   | 2 k8s misconfigurations in configmap.yaml (non-blocking)          |
+| Docker                                   | ❌ BLOCKED_BY_ENVIRONMENT | Not available                                                     |
 
 ---
 
 ## Protobuf/API Compatibility Review
 
-| Change | File | Old | New | Reason | Compatibility Impact |
-|--------|------|-----|-----|--------|---------------------|
-| RPC response names | gateway, harness, sandbox, workflow | ExecutionRecord, AgentState, SessionInfo | GetExecutionResponse, GetAgentStateResponse, GetSessionResponse | Lint compliance (RPC_RESPONSE_STANDARD_NAME) | Breaking (new message names) |
-| Enum values | shared/common.proto | CAPABILITY_FILESYSTEM_READ etc. | CAPABILITY_TYPE_FILESYSTEM_READ etc. | Lint compliance (ENUM_VALUE_PREFIX) | Breaking (enum value names) |
-| Unused imports | gateway.proto | shared, workflow imports | Removed | Lint compliance (IMPORT_USED) | Non-breaking |
-| Validation annotations | All protos | Removed | Restored (buf.validate) | Security/validation | Non-breaking (additive) |
-| HTTP annotations | All protos | None | Added google.api.http | REST gateway | Non-breaking (additive) |
-| Package paths | All protos | gix/... | api/proto/gix/... | Module boundary (ADR-0002) | Breaking (import paths) |
+| Change                 | File                                | Old                                      | New                                                             | Reason                                       | Compatibility Impact         |
+| ---------------------- | ----------------------------------- | ---------------------------------------- | --------------------------------------------------------------- | -------------------------------------------- | ---------------------------- |
+| RPC response names     | gateway, harness, sandbox, workflow | ExecutionRecord, AgentState, SessionInfo | GetExecutionResponse, GetAgentStateResponse, GetSessionResponse | Lint compliance (RPC_RESPONSE_STANDARD_NAME) | Breaking (new message names) |
+| Enum values            | shared/common.proto                 | CAPABILITY_FILESYSTEM_READ etc.          | CAPABILITY_TYPE_FILESYSTEM_READ etc.                            | Lint compliance (ENUM_VALUE_PREFIX)          | Breaking (enum value names)  |
+| Unused imports         | gateway.proto                       | shared, workflow imports                 | Removed                                                         | Lint compliance (IMPORT_USED)                | Non-breaking                 |
+| Validation annotations | All protos                          | Removed                                  | Restored (buf.validate)                                         | Security/validation                          | Non-breaking (additive)      |
+| HTTP annotations       | All protos                          | None                                     | Added google.api.http                                           | REST gateway                                 | Non-breaking (additive)      |
+| Package paths          | All protos                          | gix/...                                  | api/proto/gix/...                                               | Module boundary (ADR-0002)                   | Breaking (import paths)      |
 
 **Field numbers**: No field numbers changed.
 **New fields**: Only validation options and HTTP annotations added.
@@ -102,23 +102,23 @@ All M0 validation gates have been successfully completed. The Go 1.25 toolchain 
 
 ## Security Tooling Results
 
-| Scan | Tool | Critical | High | Medium | Low | Status |
-|------|------|----------|------|--------|-----|--------|
-| Secret Scan | TruffleHog 3.99.0 | 0 | 0 | 0 | 0 | ✅ PASS |
-| Dependency Scan (Go) | gosec 2.21.0 | - | - | - | - | ⚠️ BLOCKED (internal error) |
-| Container Scan | Trivy 0.75.0 | 0 | 0 | 2 | 0 | ✅ PASS (2 k8s misconfigs in configmap.yaml) |
-| Secret Scan | TruffleHog 3.99.0 | 0 | 0 | 0 | 0 | ✅ PASS |
-| Container Scan | Trivy 0.75.0 | 0 | 0 | 0 | 0 | ✅ PASS (go.mod files clean) |
+| Scan                 | Tool              | Critical | High | Medium | Low | Status                                       |
+| -------------------- | ----------------- | -------- | ---- | ------ | --- | -------------------------------------------- |
+| Secret Scan          | TruffleHog 3.99.0 | 0        | 0    | 0      | 0   | ✅ PASS                                      |
+| Dependency Scan (Go) | gosec 2.21.0      | -        | -    | -      | -   | ⚠️ BLOCKED (internal error)                  |
+| Container Scan       | Trivy 0.75.0      | 0        | 0    | 2      | 0   | ✅ PASS (2 k8s misconfigs in configmap.yaml) |
+| Secret Scan          | TruffleHog 3.99.0 | 0        | 0    | 0      | 0   | ✅ PASS                                      |
+| Container Scan       | Trivy 0.75.0      | 0        | 0    | 0      | 0   | ✅ PASS (go.mod files clean)                 |
 
 ---
 
 ## Go Compilation Status
 
-| Module | Go Version | Build | Vet | Compilation |
-|--------|------------|-------|-----|-------------|
-| api | 1.25.0 | ✅ PASS | ✅ PASS | ✅ PASS |
-| shared | 1.25.0 | ✅ PASS | ✅ PASS | ✅ PASS |
-| Other modules | 1.25.0 | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_GO_PACKAGES |
+| Module        | Go Version | Build          | Vet            | Compilation    |
+| ------------- | ---------- | -------------- | -------------- | -------------- |
+| api           | 1.25.0     | ✅ PASS        | ✅ PASS        | ✅ PASS        |
+| shared        | 1.25.0     | ✅ PASS        | ✅ PASS        | ✅ PASS        |
+| Other modules | 1.25.0     | NO_GO_PACKAGES | NO_GO_PACKAGES | NO_GO_PACKAGES |
 
 **Go compilation**: ✅ PASS (for modules with Go code)
 
@@ -126,13 +126,13 @@ All M0 validation gates have been successfully completed. The Go 1.25 toolchain 
 
 ## Phase Boundary Compliance
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| Phase 01/02 boundary preserved | ✅ YES | No Temporal/workflow engine implementation |
-| Phase 03 introduced | ✅ NO | No CLI/IDE/Web interfaces |
-| Phase 04 introduced | ✅ NO | No multi-tenancy/RBAC |
-| M1 functionality introduced | ✅ NO | No Gateway/Sandbox/Router/Harness business logic |
-| Protobuf contracts only | ✅ YES | Only API contracts and generation foundation |
+| Check                          | Status | Notes                                            |
+| ------------------------------ | ------ | ------------------------------------------------ |
+| Phase 01/02 boundary preserved | ✅ YES | No Temporal/workflow engine implementation       |
+| Phase 03 introduced            | ✅ NO  | No CLI/IDE/Web interfaces                        |
+| Phase 04 introduced            | ✅ NO  | No multi-tenancy/RBAC                            |
+| M1 functionality introduced    | ✅ NO  | No Gateway/Sandbox/Router/Harness business logic |
+| Protobuf contracts only        | ✅ YES | Only API contracts and generation foundation     |
 
 ---
 
@@ -166,9 +166,10 @@ The M0 foundation is complete and verified:
 ✅ Formatting checks pass (gofmt + prettier)  
 ✅ Security scanning: trufflehog PASS, trivy PASS (2 non-blocking k8s findings)  
 ✅ Protobuf contracts at approved location (`api/proto/gix/*/v1/`)  
-✅ No M1/M2/M3/M4 functionality introduced  
+✅ No M1/M2/M3/M4 functionality introduced
 
-**Remaining work for M1**: 
+**Remaining work for M1**:
+
 - Implement Gateway, Sandbox, Router, Harness business logic
 - Resolve golangci-lint typecheck when compatible version available
 - Investigate gosec internal error with prometheus client_golang
@@ -183,7 +184,7 @@ The M0 foundation is complete and verified:
 
 ```
 $ buf lint          # PASS (no output)
-$ buf build         # PASS (no output)  
+$ buf build         # PASS (no output)
 $ buf generate      # PASS (no output, deterministic)
 $ go work sync      # PASS
 $ go list ./...     # PASS (api: 8 packages, shared: 11 packages)

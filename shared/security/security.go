@@ -116,7 +116,6 @@ func ParseJWT(tokenString string, verificationKey []byte) (*JWTClaims, error) {
 		}
 		return verificationKey, nil
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("parse JWT: %w", err)
 	}

@@ -1,66 +1,10 @@
 package architecture
 
 import (
-	"go/parser"
-	"go/token"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
-
-func findProjectRoot() string {
-	dir, _ := filepath.Abs(".")
-	for {
-		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			return "."
-		}
-		dir = parent
-	}
-}
-
-func collectImports(t *testing.T, dir string) []string {
-	var imports []string
-
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !strings.HasSuffix(path, ".go") {
-			return nil
-		}
-
-		if strings.HasSuffix(path, "_test.go") {
-			return nil
-		}
-
-		if strings.Contains(path, "migrations") {
-			return nil
-		}
-
-		fset := token.NewFileSet()
-		f, err := parser.ParseFile(fset, path, nil, parser.ImportsOnly)
-		if err != nil {
-			return nil
-		}
-
-		for _, imp := range f.Imports {
-			impPath := strings.Trim(imp.Path.Value, `"`)
-			imports = append(imports, impPath)
-		}
-
-		return nil
-	})
-
-	return imports
-}
 
 // TestLayerViolations tests that modules don't violate layer boundaries
 func TestLayerViolations(t *testing.T) {
@@ -110,7 +54,7 @@ func TestLayerViolations(t *testing.T) {
 			}
 
 			// Check if importing from another module
-			for otherName, otherLayer := range layers {
+			for otherName := range layers {
 				if otherName == module.Name {
 					continue
 				}
@@ -127,37 +71,6 @@ func TestLayerViolations(t *testing.T) {
 						)
 					}
 				}
-			}
-		}
-	}
-}
-
-// TestNoDirectDatabaseAccess tests that modules don't access other module's databases directly
-func TestNoDirectDatabaseAccess(t *testing.T) {
-	// Check for direct SQL queries or database access patterns that violate ownership
-	// This is a simplified check - full enforcement requires static analysis tools
-
-	modules := GetModules()
-	rootDir := findProjectRoot()
-
-	for _, module := range modules {
-		if module.Path == "api" {
-			continue
-		}
-
-		modulePath := filepath.Join(rootDir, module.Path)
-		imports := collectImports(t, modulePath)
-
-		for _, imp := range imports {
-			// Check for direct database access patterns
-			// Direct database access should only be in the owning module
-			if strings.Contains(imp, "database/sql") ||
-				strings.Contains(imp, "github.com/jackc/pgx") ||
-				strings.Contains(imp, "gorm.io") ||
-				strings.Contains(imp, "database") {
-				// This is allowed only if the module owns the database
-				// For now, we just log it - full enforcement requires deeper analysis
-				t.Logf("Module %s imports database package: %s", module.Name, imp)
 			}
 		}
 	}
@@ -212,77 +125,4 @@ func TestNoSQLInApplicationLayer(t *testing.T) {
 			}
 		}
 	}
-}
-
-func findProjectRoot() string {
-	dir, _ := filepath.Abs(".")
-	for {
-		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			return "."
-		}
-		dir = parent
-	}
-}
-
-func collectImports(t *testing.T, dir string) []string {
-	var imports []string
-
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !strings.HasSuffix(path, ".go") {
-			return nil
-		}
-
-		if strings.HasSuffix(path, "_test.go") {
-			return nil
-		}
-
-		if strings.Contains(path, "migrations") {
-			return nil
-		}
-
-		fset := token.NewFileSet()
-		f, err := parser.ParseFile(fset, path, nil, parser.ImportsOnly)
-		if err != nil {
-			return nil
-		}
-
-		for _, imp := range f.Imports {
-			impPath := strings.Trim(imp.Path.Value, `"`)
-			imports = append(imports, impPath)
-		}
-
-		return nil
-	})
-
-	return imports
-}
-
-func isStdLib(imp string) bool {
-	stdLibs := []string{
-		"archive", "bufio", "bytes", "compress", "container", "context",
-		"crypto", "database", "debug", "encoding", "errors", "expvar",
-		"flag", "fmt", "hash", "html", "image", "index", "io", "log",
-		"math", "mime", "net", "os", "path", "plugin", "reflect", "regexp",
-		"runtime", "sort", "strconv", "strings", "sync", "syscall", "testing",
-		"text", "time", "unicode", "unsafe",
-	}
-
-	for _, std := range stdLibs {
-		if strings.HasPrefix(imp, std) {
-			return true
-		}
-	}
-	return false
-}
-
-func isExternalDep(imp string) bool {
-	return strings.Contains(imp, ".")
 }

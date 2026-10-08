@@ -212,6 +212,11 @@ func Extract(ctx context.Context, carrier propagation.TextMapCarrier) context.Co
 	return otel.GetTextMapPropagator().Extract(ctx, carrier)
 }
 
+// StartSpan starts a new span with the given name.
+func StartSpan(ctx context.Context, name string, opts ...trace.SpanStartOption) (context.Context, trace.Span) {
+	return otel.Tracer("gateway").Start(ctx, name, opts...)
+}
+
 // SpanFromContext returns the span from context.
 func SpanFromContext(ctx context.Context) trace.Span {
 	return trace.SpanFromContext(ctx)
@@ -257,6 +262,16 @@ func SetAttributes(ctx context.Context, attrs ...attribute.KeyValue) {
 	if span.IsRecording() {
 		span.SetAttributes(attrs...)
 	}
+}
+
+// StringAttribute creates a string attribute for tracing.
+func StringAttribute(key, value string) attribute.KeyValue {
+	return attribute.String(key, value)
+}
+
+// IntAttribute creates an int attribute for tracing.
+func IntAttribute(key string, value int) attribute.KeyValue {
+	return attribute.Int(key, value)
 }
 
 // WithSpan runs a function with a new span.

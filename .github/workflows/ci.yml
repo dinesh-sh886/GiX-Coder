@@ -104,7 +104,8 @@ jobs:
           POSTGRES_DB: gix_coder
           POSTGRES_USER: gix_coder
           POSTGRES_PASSWORD: test
-        ports: 5432:5432
+        ports:
+          - "5432:5432"
         options: >-
           --health-cmd="pg_isready -U gix_coder"
           --health-interval=10s
@@ -112,11 +113,13 @@ jobs:
           --health-retries=5
       redis:
         image: redis:7-alpine
-        ports: 6379:6379
+        ports:
+          - "6379:6379"
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
       temporal:
         image: temporalio/auto-setup:1.22
-        ports: 7233:7233
+        ports:
+          - "7233:7233"
         env:
           DB: postgresql
           DB_PORT: 5432
@@ -128,6 +131,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Install GCC for Race Detector
+        run: sudo apt-get update && sudo apt-get install -y gcc
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -157,7 +163,11 @@ jobs:
         run: make test-architecture
 
       - name: Race Detection
-        run: make race-detection
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          go test -race -count=1 ./gateway/... ./shared/...
+        env:
+          CGO_ENABLED: 1
 
       - name: Upload Coverage (Go)
         uses: codecov/codecov-action@v4

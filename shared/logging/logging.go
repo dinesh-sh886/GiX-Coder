@@ -27,6 +27,11 @@ type Logger struct {
 	logger zerolog.Logger
 }
 
+// Zerolog returns the underlying zerolog logger for chained API usage.
+func (l *Logger) Zerolog() *zerolog.Logger {
+	return &l.logger
+}
+
 // Config holds logging configuration.
 type Config struct {
 	Level      Level

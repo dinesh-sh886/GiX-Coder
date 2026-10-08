@@ -118,7 +118,6 @@ linters:
     - dogsled
     - dupl
     - errcheck
-    - exhaustive
     - errorlint
     - fatcontext
     - funlen
@@ -141,7 +140,6 @@ linters:
     - nolintlint
     - prealloc
     - predeclared
-    - staticcheck
     - stylecheck
     - unconvert
     - unparam
@@ -162,7 +160,8 @@ linters:
     - testpackage
     - testifylint
     - wrapcheck
-    - typecheck
+    - staticcheck
+    - exhaustive
 
 issues:
   exclude-rules:

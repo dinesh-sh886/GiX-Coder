@@ -10,5 +10,6 @@ use (
 	./router
 	./sandbox
 	./shared
+	./test
 	./workflow
 )

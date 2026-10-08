@@ -3,11 +3,10 @@ package architecture
 import (
 	"go/parser"
 	"go/token"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func findProjectRoot() string {

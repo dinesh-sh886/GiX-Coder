@@ -25,10 +25,13 @@ CREATE INDEX IF NOT EXISTS idx_gateway_executions_correlation ON gateway.executi
 CREATE INDEX IF NOT EXISTS idx_gateway_executions_started ON gateway.executions(started_at);
 
 -- Idempotency keys table
-CREATE TABLE IF NOT EXISTS gateway.idempotency_keys (
+DROP TABLE IF EXISTS gateway.idempotency_keys CASCADE;
+CREATE TABLE gateway.idempotency_keys (
     idempotency_key TEXT PRIMARY KEY,
-    execution_id UUID NOT NULL REFERENCES gateway.executions(execution_id),
-    response JSONB,
+    request_hash VARCHAR(64) NOT NULL,
+    response_status INT NOT NULL,
+    response_body BYTEA,
+    response_content_type VARCHAR(128),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     expires_at TIMESTAMPTZ NOT NULL
 );
