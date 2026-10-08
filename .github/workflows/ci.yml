@@ -55,7 +55,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+          cache: false
 
       - name: Install Tools
         run: make install-tools
@@ -145,7 +145,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+          cache: false
 
       - name: Run Unit Tests (Go)
         run: make test-unit-go
@@ -205,7 +205,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+          cache: false
 
       - name: Secret Scan
         uses: trufflesecurity/trufflehog@v3
