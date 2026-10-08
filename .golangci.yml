@@ -1,0 +1,196 @@
+run:
+  timeout: 5m
+  issues-exit-code: 1
+  tests: true
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+linters-settings:
+  govet:
+    check-shadowing: true
+    enable-all: true
+    disable:
+      - fieldalignment
+  golint:
+    min-confidence: 0.8
+  gosec:
+    excludes:
+      - G104 # Errors unhandled (we handle errors explicitly)
+      - G115 # G115: integer overflow conversion (handled by architecture)
+  staticcheck:
+    checks:
+      [
+        "all",
+        "-ST1000",
+        "-ST1003",
+        "-ST1016",
+        "-ST1020",
+        "-ST1021",
+        "-ST1022",
+        "-ST1023",
+      ]
+  gocyclo:
+    min-complexity: 15
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - dupImport
+      - ifElseChain
+      - singleCaseSwitch
+      - paramTypeCombine
+      - unnamedResult
+      - whyNoLint
+      - wrapperFunc
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+        disabled: false
+      - name: unused-parameter
+        severity: warning
+      - name: unreachable-code
+        severity: error
+      - name: redefines-builtin-id
+        severity: error
+      - name: superfluous-else
+        severity: warning
+      - name: empty-block
+        severity: warning
+      - name: confusing-naming
+        severity: warning
+      - name: get-return
+        severity: warning
+      - name: range
+        severity: warning
+      - name: range-val-in-closure
+        severity: warning
+      - name: waitgroup
+        severity: error
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  misspell:
+    locale: US
+  unparam:
+    check-exported: false
+  prealloc:
+    simple: true
+  bodyclose:
+    check-all: true
+  depguard:
+    rules:
+      Main:
+        list-mode: lax
+        files:
+          - $all
+        allow:
+          - $gostd
+          - github.com/gix-coder/gix-coder/*
+          - github.com/gin-gonic/gin
+          - github.com/go-playground/validator/v10
+          - github.com/jackc/pgx/v5
+          - github.com/redis/go-redis/v9
+          - github.com/rs/zerolog
+          - github.com/spf13/viper
+          - github.com/prometheus/client_golang
+          - go.opentelemetry.io/otel
+          - google.golang.org/grpc
+          - google.golang.org/protobuf
+          - golang.org/x/crypto
+          - golang.org/x/sync
+          - golang.org/x/time
+
+linters:
+  enable:
+    - bodyclose
+    - depguard
+    - dogsled
+    - dupl
+    - errcheck
+    - errorlint
+    - fatcontext
+    - funlen
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - makezero
+    - misspell
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnil
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - stylecheck
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
+    - gocyclo
+    - goconst
+    - gocritic
+    - gosec
+  disable:
+    - golint
+    - gochecknoglobals
+    - maligned
+    - nosnakecase
+    - varnamelen
+    - wsl
+    - exhaustivestruct
+    - testpackage
+    - testifylint
+    - wrapcheck
+    - staticcheck
+    - exhaustive
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gosec
+        - gocyclo
+        - funlen
+        - goconst
+    - path: _mock\.go
+      linters:
+        - gosec
+        - gocyclo
+        - goconst
+    - path: migrations/
+      linters:
+        - all
+
+severity:
+  default-severity: error
+  case-sensitive: false
+  rules:
+    - linters:
+        - gosec
+      severity: warning
+
+exclude:
+  - migrations/
+  - api/proto/
+  - vendor/
+  - .git/
+  - node_modules/

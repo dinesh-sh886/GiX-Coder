@@ -60,12 +60,14 @@ See [Phase 00 Documentation](docs/phases/phase-00/README.md)
 ## Getting Started
 
 ### Prerequisites
+
 - Go 1.22+
 - Node.js 20+ / TypeScript 5+
 - Docker / Docker Compose
 - Kubernetes (kind/minikube for local)
 
 ### Local Development
+
 ```bash
 # Clone
 git clone https://github.com/dinesh-sh886/GiX-Coder.git

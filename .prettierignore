@@ -1,0 +1,20 @@
+# Ignore GitHub issue templates (contain markdown in YAML front matter)
+.github/ISSUE_TEMPLATE/*.yml
+
+# Ignore generated OpenAPI specs
+api/openapi/**/*.json
+api/proto/**/*.json
+
+# Ignore generated protobuf files
+api/proto/**/*.pb.go
+
+# Ignore generated mock files
+**/*_mock.go
+
+# Ignore test fixtures
+test/fixtures/**
+
+# Ignore build artifacts
+dist/
+build/
+*.pb.go

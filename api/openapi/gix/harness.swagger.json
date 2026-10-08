@@ -1,0 +1,724 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/proto/gix/harness/v1/harness.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "HarnessService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/agents": {
+      "post": {
+        "summary": "SpawnAgent spawns a new agent",
+        "operationId": "HarnessService_SpawnAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SpawnAgentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SpawnAgentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "HarnessService"
+        ]
+      }
+    },
+    "/agents/{agentId}/state": {
+      "get": {
+        "summary": "GetAgentState gets the current state of an agent",
+        "operationId": "HarnessService_GetAgentState",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetAgentStateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "HarnessService"
+        ]
+      }
+    },
+    "/agents/{agentId}:checkpoint": {
+      "post": {
+        "summary": "Checkpoint creates a checkpoint of agent state",
+        "operationId": "HarnessService_Checkpoint",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CheckpointResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1HarnessServiceCheckpointBody"
+            }
+          }
+        ],
+        "tags": [
+          "HarnessService"
+        ]
+      }
+    },
+    "/agents/{agentId}:execute": {
+      "post": {
+        "summary": "ExecuteStep executes a step with a tool",
+        "operationId": "HarnessService_ExecuteStep",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ExecuteStepResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/HarnessServiceExecuteStepBody"
+            }
+          }
+        ],
+        "tags": [
+          "HarnessService"
+        ]
+      }
+    },
+    "/agents/{agentId}:terminate": {
+      "post": {
+        "summary": "TerminateAgent terminates an agent",
+        "operationId": "HarnessService_TerminateAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1TerminateAgentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/HarnessServiceTerminateAgentBody"
+            }
+          }
+        ],
+        "tags": [
+          "HarnessService"
+        ]
+      }
+    },
+    "/agents:restore": {
+      "post": {
+        "summary": "Restore restores agent state from a checkpoint",
+        "operationId": "HarnessService_Restore",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RestoreResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RestoreRequest"
+            }
+          }
+        ],
+        "tags": [
+          "HarnessService"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "summary": "Health check",
+        "operationId": "HarnessService_HealthLive",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gixharnessv1HealthLiveResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "HarnessService"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "HarnessService_HealthReady",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gixharnessv1HealthReadyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "HarnessService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "HarnessServiceExecuteStepBody": {
+      "type": "object",
+      "properties": {
+        "stepName": {
+          "type": "string"
+        },
+        "tool": {
+          "type": "string"
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "capabilityGrant": {
+          "$ref": "#/definitions/v1CapabilityGrant"
+        }
+      },
+      "title": "ExecuteStepRequest represents a step execution request"
+    },
+    "HarnessServiceTerminateAgentBody": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string"
+        }
+      },
+      "title": "TerminateAgentRequest represents a terminate agent request"
+    },
+    "gixharnessv1HealthLiveResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        }
+      },
+      "title": "HealthLiveResponse represents a liveness check response"
+    },
+    "gixharnessv1HealthReadyResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1HealthCheck"
+          }
+        }
+      },
+      "title": "HealthReadyResponse represents a readiness check response"
+    },
+    "gixsharedv1ResourceUsage": {
+      "type": "object",
+      "properties": {
+        "cpuMs": {
+          "type": "string",
+          "format": "int64"
+        },
+        "memoryBytes": {
+          "type": "string",
+          "format": "int64"
+        },
+        "ioBytes": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "ResourceUsage represents resource usage metrics"
+    },
+    "harnessv1Checkpoint": {
+      "type": "object",
+      "properties": {
+        "checkpointId": {
+          "type": "string"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "executionId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "sizeBytes": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "Checkpoint represents a checkpoint"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "Identifies the type of the serialized Protobuf message with a URI reference\nconsisting of a prefix ending in a slash and the fully-qualified type name.\n\nExample: type.googleapis.com/google.protobuf.StringValue\n\nThis string must contain at least one `/` character, and the content after\nthe last `/` must be the fully-qualified name of the type in canonical\nform, without a leading dot. Do not write a scheme on these URI references\nso that clients do not attempt to contact them.\n\nThe prefix is arbitrary and Protobuf implementations are expected to\nsimply strip off everything up to and including the last `/` to identify\nthe type. `type.googleapis.com/` is a common default prefix that some\nlegacy implementations require. This prefix does not indicate the origin of\nthe type, and URIs containing it are not expected to respond to any\nrequests.\n\nAll type URL strings must be legal URI references with the additional\nrestriction (for the text format) that the content of the reference\nmust consist only of alphanumeric characters, percent-encoded escapes, and\ncharacters in the following set (not including the outer backticks):\n`/-.~_!$\u0026()*+,;=`. Despite our allowing percent encodings, implementations\nshould not unescape them to prevent confusion with existing parsers. For\nexample, `type.googleapis.com%2FFoo` should be rejected.\n\nIn the original design of `Any`, the possibility of launching a type\nresolution service at these type URLs was considered but Protobuf never\nimplemented one and considers contacting these URLs to be problematic and\na potential security issue. Do not attempt to contact type URLs."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nIn its binary encoding, an `Any` is an ordinary message; but in other wire\nforms like JSON, it has a special encoding. The format of the type URL is\ndescribed on the `type_url` field.\n\nProtobuf APIs provide utilities to interact with `Any` values:\n\n- A 'pack' operation accepts a message and constructs a generic `Any` wrapper\n  around it.\n- An 'unpack' operation reads the content of an `Any` message, either into an\n  existing message or a new one. Unpack operations must check the type of the\n  value they unpack against the declared `type_url`.\n- An 'is' operation decides whether an `Any` contains a message of the given\n  type, i.e. whether it can 'unpack' that type.\n\nThe JSON format representation of an `Any` follows one of these cases:\n\n- For types without special-cased JSON encodings, the JSON format\n  representation of the `Any` is the same as that of the message, with an\n  additional `@type` field which contains the type URL.\n- For types with special-cased JSON encodings (typically called 'well-known'\n  types, listed in https://protobuf.dev/programming-guides/json/#any), the\n  JSON format representation has a key `@type` which contains the type URL\n  and a key `value` which contains the JSON-serialized value.\n\nThe text format representation of an `Any` is like a message with one field\nwhose name is the type URL in brackets. For example, an `Any` containing a\n`foo.Bar` message may be written `[type.googleapis.com/foo.Bar] { a: 2 }`."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AgentDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "AgentDefinition represents an agent definition"
+    },
+    "v1AgentState": {
+      "type": "object",
+      "properties": {
+        "agentId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "currentStep": {
+          "type": "string"
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "AgentState represents agent state"
+    },
+    "v1CapabilityGrant": {
+      "type": "object",
+      "properties": {
+        "grantId": {
+          "type": "string"
+        },
+        "executionId": {
+          "type": "string"
+        },
+        "capabilityType": {
+          "$ref": "#/definitions/v1CapabilityType"
+        },
+        "resourceScope": {
+          "type": "string"
+        },
+        "constraints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "issuedAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "policyVersion": {
+          "type": "string"
+        },
+        "auditContext": {
+          "type": "string"
+        }
+      },
+      "title": "CapabilityGrant represents a capability grant"
+    },
+    "v1CapabilityType": {
+      "type": "string",
+      "enum": [
+        "CAPABILITY_TYPE_UNSPECIFIED",
+        "CAPABILITY_TYPE_FILESYSTEM_READ",
+        "CAPABILITY_TYPE_FILESYSTEM_WRITE",
+        "CAPABILITY_TYPE_FILESYSTEM_LIST",
+        "CAPABILITY_TYPE_SHELL_EXECUTE",
+        "CAPABILITY_TYPE_GIT_READ",
+        "CAPABILITY_TYPE_GIT_WRITE",
+        "CAPABILITY_TYPE_TEST_EXECUTE",
+        "CAPABILITY_TYPE_NETWORK_EGRESS",
+        "CAPABILITY_TYPE_MCP_INVOKE"
+      ],
+      "default": "CAPABILITY_TYPE_UNSPECIFIED",
+      "title": "CapabilityType represents a capability type"
+    },
+    "v1CheckpointResponse": {
+      "type": "object",
+      "properties": {
+        "checkpointId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "sizeBytes": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "CheckpointResponse represents a checkpoint response"
+    },
+    "v1ExecuteStepResponse": {
+      "type": "object",
+      "properties": {
+        "output": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "errorCode": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "durationMs": {
+          "type": "string",
+          "format": "int64"
+        },
+        "checkpoint": {
+          "$ref": "#/definitions/harnessv1Checkpoint"
+        },
+        "resources": {
+          "$ref": "#/definitions/gixsharedv1ResourceUsage"
+        }
+      },
+      "title": "ExecuteStepResponse represents a step execution response"
+    },
+    "v1GetAgentStateResponse": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/v1AgentState"
+        }
+      },
+      "title": "GetAgentStateResponse represents a get agent state response"
+    },
+    "v1HarnessServiceCheckpointBody": {
+      "type": "object",
+      "properties": {
+        "executionId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "CheckpointRequest represents a checkpoint request"
+    },
+    "v1HealthCheck": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "latencyMs": {
+          "type": "string",
+          "format": "int64"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "title": "HealthCheck represents a health check"
+    },
+    "v1RequestContext": {
+      "type": "object",
+      "properties": {
+        "correlationId": {
+          "type": "string"
+        },
+        "traceId": {
+          "type": "string"
+        },
+        "spanId": {
+          "type": "string"
+        },
+        "tenantId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "workflowId": {
+          "type": "string"
+        },
+        "workflowType": {
+          "type": "string"
+        }
+      },
+      "title": "RequestContext holds request context for routing and policy"
+    },
+    "v1RestoreRequest": {
+      "type": "object",
+      "properties": {
+        "checkpointId": {
+          "type": "string"
+        }
+      },
+      "title": "RestoreRequest represents a restore request"
+    },
+    "v1RestoreResponse": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "restoredAt": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "title": "RestoreResponse represents a restore response"
+    },
+    "v1SpawnAgentRequest": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/v1AgentDefinition"
+        },
+        "capabilityGrants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1CapabilityGrant"
+          }
+        },
+        "initialState": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "workflowContext": {
+          "$ref": "#/definitions/v1RequestContext"
+        }
+      },
+      "title": "SpawnAgentRequest represents a request to spawn an agent"
+    },
+    "v1SpawnAgentResponse": {
+      "type": "object",
+      "properties": {
+        "agentId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "title": "SpawnAgentResponse represents a spawn agent response"
+    },
+    "v1TerminateAgentResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "title": "TerminateAgentResponse represents a terminate agent response"
+    }
+  }
+}

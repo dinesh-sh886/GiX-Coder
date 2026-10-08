@@ -12,14 +12,14 @@ Phase 00 requires approval from all listed roles before proceeding to Phase 01.
 
 ## Sign-Offs
 
-| Role | Required | Name | Date | Signature | Comments |
-|------|----------|------|------|-----------|----------|
-| **Architect** | Yes | | | | Architecture baseline, principles, standards |
-| **Security Lead** | Yes | | | | Security baseline, threat model, controls |
-| **Product Owner** | Yes | | | | Product charter, Phase 01 scope, priorities |
-| **Platform Lead** | Yes | | | | CI/CD, environments, observability, testing |
-| **QA Lead** | Yes | | | | Testing strategy, quality gates, acceptance criteria |
-| **Release Manager** | Yes | | | | Git strategy, release process, Phase lifecycle |
+| Role                | Required | Name | Date | Signature | Comments                                             |
+| ------------------- | -------- | ---- | ---- | --------- | ---------------------------------------------------- |
+| **Architect**       | Yes      |      |      |           | Architecture baseline, principles, standards         |
+| **Security Lead**   | Yes      |      |      |           | Security baseline, threat model, controls            |
+| **Product Owner**   | Yes      |      |      |           | Product charter, Phase 01 scope, priorities          |
+| **Platform Lead**   | Yes      |      |      |           | CI/CD, environments, observability, testing          |
+| **QA Lead**         | Yes      |      |      |           | Testing strategy, quality gates, acceptance criteria |
+| **Release Manager** | Yes      |      |      |           | Git strategy, release process, Phase lifecycle       |
 
 ## Approval Criteria Met
 
@@ -47,13 +47,31 @@ Upon completion of all sign-offs above, Phase 01 (Agent Gateway & Execution Sand
 
 ## Approval Record
 
-| Role | Name | Date | Approved |
-|------|------|------|----------|
-| Architect | | | ☐ |
-| Security Lead | | | ☐ |
-| Product Owner | | | ☐ |
-| Platform Lead | | | ☐ |
-| QA Lead | | | ☐ |
-| Release Manager | | | ☐ |
+| Role            | Name | Date | Approved |
+| --------------- | ---- | ---- | -------- |
+| Architect       |      |      | ☐        |
+| Security Lead   |      |      | ☐        |
+| Product Owner   |      |      | ☐        |
+| Platform Lead   |      |      | ☐        |
+| QA Lead         |      |      | ☐        |
+| Release Manager |      |      | ☐        |
 
 **Final Authorization**: _________________________ (Architect) Date: _______________
+
+---
+
+## Metadata
+
+---
+
+title: Phase 00 Approval
+type: phase
+phase: 00
+status: Pending Approval
+author: Release Manager
+date: 2024-10-07
+reviewers: Architect, Security Lead, Product Owner, Platform Lead, QA Lead, Release Manager
+approved_by: N/A - Pending Signatures
+related_adrs: [ADR-0001, ADR-0002, ADR-0003, ADR-0004]
+related_issues: []
+---

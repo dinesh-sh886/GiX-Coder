@@ -1,0 +1,264 @@
+syntax = "proto3";
+
+package gix.harness.v1;
+
+option go_package = "github.com/gix-coder/gix-coder/api/proto/gix/harness/v1;harnessv1";
+
+import "api/proto/gix/shared/v1/common.proto";
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+service HarnessService {
+  rpc SpawnAgent(SpawnAgentRequest) returns (SpawnAgentResponse) {
+    option (google.api.http) = {
+      post: "/agents"
+      body: "*"
+    };
+  }
+  
+  rpc GetAgentState(GetAgentStateRequest) returns (GetAgentStateResponse) {
+    option (google.api.http) = {
+      get: "/agents/{agent_id}/state"
+    };
+  }
+  
+  rpc ExecuteStep(ExecuteStepRequest) returns (ExecuteStepResponse) {
+    option (google.api.http) = {
+      post: "/agents/{agent_id}:execute"
+      body: "*"
+    };
+  }
+  
+  rpc Checkpoint(CheckpointRequest) returns (CheckpointResponse) {
+    option (google.api.http) = {
+      post: "/agents/{agent_id}:checkpoint"
+      body: "*"
+    };
+  }
+  
+  rpc Restore(RestoreRequest) returns (RestoreResponse) {
+    option (google.api.http) = {
+      post: "/agents:restore"
+      body: "*"
+    };
+  }
+  
+  rpc TerminateAgent(TerminateAgentRequest) returns (TerminateAgentResponse) {
+    option (google.api.http) = {
+      post: "/agents/{agent_id}:terminate"
+      body: "*"
+    };
+  }
+  
+  rpc HealthLive(HealthLiveRequest) returns (HealthLiveResponse) {
+    option (google.api.http) = {
+      get: "/health/live"
+    };
+  }
+  rpc HealthReady(HealthReadyRequest) returns (HealthReadyResponse) {
+    option (google.api.http) = {
+      get: "/health/ready"
+    };
+  }
+}
+
+message SpawnAgentRequest {
+  AgentDefinition agent = 1;
+  repeated gix.shared.v1.CapabilityGrant capability_grants = 2;
+  map<string, string> initial_state = 3;
+  gix.shared.v1.RequestContext workflow_context = 4;
+}
+
+message AgentDefinition {
+  string name = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string version = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  string type = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  map<string, string> config = 4;
+  repeated string capabilities = 5 [
+    (buf.validate.field).repeated.max_items = 64
+  ];
+  repeated string tools = 6 [
+    (buf.validate.field).repeated.max_items = 64
+  ];
+}
+
+message SpawnAgentResponse {
+  string agent_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string state = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  string error = 3 [
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+message GetAgentStateRequest {
+  string agent_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message GetAgentStateResponse {
+  AgentState state = 1;
+}
+
+message AgentState {
+  string agent_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string state = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  string current_step = 3 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  map<string, string> variables = 4;
+  int64 updated_at = 5 [
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+message ExecuteStepRequest {
+  string agent_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string step_name = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string tool = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  map<string, string> input = 4;
+  gix.shared.v1.CapabilityGrant capability_grant = 5;
+}
+
+message ExecuteStepResponse {
+  map<string, string> output = 1;
+  string error_code = 2 [
+    (buf.validate.field).string.max_len = 64
+  ];
+  string error_message = 3 [
+    (buf.validate.field).string.max_len = 512
+  ];
+  int64 duration_ms = 4 [
+    (buf.validate.field).int64.gte = 0
+  ];
+  Checkpoint checkpoint = 5;
+  gix.shared.v1.ResourceUsage resources = 6;
+}
+
+message CheckpointRequest {
+  string agent_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string execution_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  map<string, string> state = 3;
+}
+
+message CheckpointResponse {
+  string checkpoint_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  int64 created_at = 2 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  int64 size_bytes = 3 [
+    (buf.validate.field).int64.gte = 0
+  ];
+}
+
+message RestoreRequest {
+  string checkpoint_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message RestoreResponse {
+  map<string, string> state = 1;
+  int64 restored_at = 2 [
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+message TerminateAgentRequest {
+  string agent_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string reason = 2 [
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+message TerminateAgentResponse {
+  bool success = 1;
+  string message = 2 [
+    (buf.validate.field).string.max_len = 256
+  ];
+}
+
+message Checkpoint {
+  string checkpoint_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string agent_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string execution_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  map<string, string> state = 4;
+  int64 created_at = 5 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  int64 size_bytes = 6 [
+    (buf.validate.field).int64.gte = 0
+  ];
+}
+
+message HealthLiveRequest {}
+
+message HealthLiveResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+}
+
+message HealthReadyRequest {}
+
+message HealthReadyResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  repeated gix.shared.v1.HealthCheck checks = 2;
+}

@@ -29,11 +29,13 @@ GitHub / GitLab / etc.
 **Decision**: Strict separation between control plane services and execution/data plane.
 
 **Rationale**:
+
 - Customer-controlled code must never execute inside control-plane services
 - Enables independent scaling, security boundaries, and failure domains
 - Supports zero-trust between execution boundaries
 
 **Boundaries**:
+
 - Control Plane: Agent Gateway, Workflow Engine, API Gateway, AuthZ/AuthN, Policy Engine
 - Data Plane: Execution Sandboxes, Agent Harness, Tool Adapters, Model Router
 
@@ -42,12 +44,14 @@ GitHub / GitLab / etc.
 **Decision**: Start with a modular monolith with clear domain boundaries, not microservices.
 
 **Rationale**:
+
 - Avoids premature distributed system complexity
 - Clear module boundaries enable future extraction
 - Simpler operations, debugging, and testing
 - Transactional consistency within domains
 
 **Module Boundaries**:
+
 ```
 gix-coder/
 ├── gateway/          # Agent Gateway - API, auth, routing
@@ -65,6 +69,7 @@ gix-coder/
 **Decision**: Agents execute in isolated sandboxes with explicit capability grants.
 
 **Capabilities** (scoped, auditable, time-limited):
+
 - File system access (read/write/list) - path-scoped
 - Shell command execution - command allowlist, timeout
 - Git operations - repo-scoped, branch-scoped
@@ -77,6 +82,7 @@ gix-coder/
 **Decision**: All long-running operations use durable workflow engine.
 
 **Characteristics**:
+
 - Event-sourced state machine
 - Automatic checkpointing
 - Retry with exponential backoff
@@ -88,6 +94,7 @@ gix-coder/
 **Decision**: Centralized model routing with policy enforcement.
 
 **Routing Factors**:
+
 - Task complexity classification
 - Cost optimization
 - Latency requirements
@@ -95,6 +102,7 @@ gix-coder/
 - Capability requirements
 
 **Policy Enforcement**:
+
 - Model allowlist per tenant
 - Token budget limits
 - PII/data classification guards
@@ -105,6 +113,7 @@ gix-coder/
 **Decision**: Immutable configuration at runtime, environment-specific via layered config.
 
 **Layers** (highest priority last):
+
 1. Defaults (code)
 2. Config files (versioned)
 3. Environment variables
@@ -116,6 +125,7 @@ gix-coder/
 **Decision**: OpenTelemetry-native from day one.
 
 **Signals**:
+
 - Structured logs (JSON, correlation IDs)
 - Metrics (RED: Rate, Errors, Duration)
 - Traces (W3C TraceContext)
@@ -123,18 +133,18 @@ gix-coder/
 
 ## Technology Choices (Baseline)
 
-| Layer | Technology | Rationale |
-|-------|------------|-----------|
-| Language | Go 1.22+ / TypeScript 5+ | Performance, type safety, ecosystem |
-| API | gRPC + REST (OpenAPI 3.1) | Internal gRPC, external REST |
-| Workflow | Temporal.io | Durable execution, visibility |
-| Sandbox | gVisor / Firecracker | Strong isolation |
-| Config | Viper / dotenv | Layered config |
-| Secrets | HashiCorp Vault / AWS Secrets Manager | Secret management |
-| Observability | OpenTelemetry Collector → Prometheus/Grafana/Loki/Tempo | Vendor-neutral |
-| CI/CD | GitHub Actions | Native GitHub integration |
-| Container | Docker / containerd | Standard runtime |
-| Orchestration | Kubernetes (EKS/GKE) | Production-grade |
+| Layer         | Technology                                              | Rationale                           |
+| ------------- | ------------------------------------------------------- | ----------------------------------- |
+| Language      | Go 1.25+ / TypeScript 5+                                | Performance, type safety, ecosystem |
+| API           | gRPC + REST (OpenAPI 3.1)                               | Internal gRPC, external REST        |
+| Workflow      | Temporal.io                                             | Durable execution, visibility       |
+| Sandbox       | gVisor / Firecracker                                    | Strong isolation                    |
+| Config        | Viper / dotenv                                          | Layered config                      |
+| Secrets       | HashiCorp Vault / AWS Secrets Manager                   | Secret management                   |
+| Observability | OpenTelemetry Collector → Prometheus/Grafana/Loki/Tempo | Vendor-neutral                      |
+| CI/CD         | GitHub Actions                                          | Native GitHub integration           |
+| Container     | Docker / containerd                                     | Standard runtime                    |
+| Orchestration | Kubernetes (EKS/GKE)                                    | Production-grade                    |
 
 ## Domain Model (High-Level)
 
@@ -159,6 +169,7 @@ Tenant
 ## Security Architecture
 
 ### Threat Model Coverage
+
 - Prompt injection → Input sanitization, output validation, capability scoping
 - Malicious repositories → Sandbox isolation, network egress control
 - Malicious dependencies → Dependency scanning, SBOM, allowlist
@@ -171,6 +182,7 @@ Tenant
 - Sandbox escape → gVisor/Firecracker, seccomp, capability dropping
 
 ### Zero Trust Boundaries
+
 - Every service-to-service call authenticated (mTLS)
 - Every agent capability explicitly granted
 - Every data access audited
@@ -194,15 +206,15 @@ User Request
 
 ## Non-Functional Requirements
 
-| Requirement | Target |
-|-------------|--------|
-| Availability | 99.9% |
-| Latency (p99) | < 500ms (gateway), < 5s (sandbox start) |
-| Throughput | 1000 concurrent executions |
-| Sandbox startup | < 2s (warm), < 10s (cold) |
-| Audit log durability | 99.9999999% (11 nines) |
-| Recovery time objective | < 10 min |
-| Recovery point objective | < 1 min |
+| Requirement              | Target                                  |
+| ------------------------ | --------------------------------------- |
+| Availability             | 99.9%                                   |
+| Latency (p99)            | < 500ms (gateway), < 5s (sandbox start) |
+| Throughput               | 1000 concurrent executions              |
+| Sandbox startup          | < 2s (warm), < 10s (cold)               |
+| Audit log durability     | 99.9999999% (11 nines)                  |
+| Recovery time objective  | < 10 min                                |
+| Recovery point objective | < 1 min                                 |
 
 ## Evolution Path
 
@@ -214,3 +226,33 @@ Phase 03: CLI/IDE/Web/API Interfaces
 Phase 04: Multi-tenancy + RBAC + Compliance
 Future:   Service extraction where justified by scale/team boundaries
 ```
+
+---
+
+## References
+
+- [Product Charter](../product/charter.md)
+- [Repository Structure](repository-structure.md)
+- [Engineering Principles](engineering-principles.md)
+- ADR-0001: Control Plane / Data Plane Separation
+- ADR-0002: Modular Monolith
+- ADR-0003: Durable Workflow Engine
+- ADR-0004: Sandbox Isolation
+
+---
+
+## Metadata
+
+---
+
+title: GiX-Coder System Architecture Baseline
+type: architecture
+phase: 00
+status: Verified
+author: Architect
+date: 2024-10-07
+reviewers: Platform Lead, Security Lead, Product Owner
+approved_by: Architect (Principal Architect)
+related_adrs: [ADR-0001, ADR-0002, ADR-0003, ADR-0004]
+related_issues: []
+---

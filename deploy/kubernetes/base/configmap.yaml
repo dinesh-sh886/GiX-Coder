@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gix-coder-config
+  namespace: gix-coder
+data:
+  # Service configuration (environment-specific values in overlays)
+  SERVICE_NAME: "gix-coder"
+  SERVICE_VERSION: "0.1.0"
+  ENVIRONMENT: "production"
+
+  # Server configuration
+  GATEWAY_HTTP_PORT: "8080"
+  GATEWAY_GRPC_PORT: "9090"
+  HARNESS_HTTP_PORT: "8082"
+  HARNESS_GRPC_PORT: "9092"
+  SANDBOX_HTTP_PORT: "8083"
+  SANDBOX_GRPC_PORT: "9093"
+  ROUTER_HTTP_PORT: "8084"
+  ROUTER_GRPC_PORT: "9094"
+  WORKFLOW_HTTP_PORT: "8085"
+  WORKFLOW_GRPC_PORT: "9095"
+  POLICY_HTTP_PORT: "8086"
+  POLICY_GRPC_PORT: "9096"
+  AUDIT_HTTP_PORT: "8087"
+  AUDIT_GRPC_PORT: "9097"
+
+  # Observability
+  LOG_LEVEL: "info"
+  LOG_FORMAT: "json"
+  TRACING_ENABLED: "true"
+  TRACING_SAMPLER: "parentbased_traceidratio"
+  TRACING_RATIO: "0.1"
+  TRACING_EXPORTER: "otlpgrpc"
+  METRICS_ENABLED: "true"
+  METRICS_PORT: "9090"
+
+  # Feature flags
+  GATEWAY_NEW_ROUTING: "false"
+  GATEWAY_ENHANCED_AUTH: "true"
+  SANDBOX_FIRECRACKER_ENABLED: "false"
+  ROUTER_ML_CLASSIFIER: "false"
+  HARNESS_CHECKPOINTING: "true"
+
+  # Observability endpoints
+  OTLP_ENDPOINT: "otel-collector:4317"
+  VAULT_ADDRESS: "http://vault:8200"
+
+  # Sandbox
+  SANDBOX_RUNTIME: "gvisor"
+  SANDBOX_DEFAULT_CPU_LIMIT: "1000m"
+  SANDBOX_DEFAULT_MEMORY_LIMIT: "512Mi"
+  SANDBOX_DEFAULT_TIMEOUT: "300s"
+  SANDBOX_MAX_CONCURRENT: "100"
+
+  # Router
+  ROUTER_DEFAULT_MODEL: "gpt-4o-mini"
+  ROUTER_MAX_TOKENS_PER_REQUEST: "32000"
+  ROUTER_COST_OPTIMIZATION: "true"
+
+  # Policy
+  POLICY_ENGINE: "opa"
+  POLICY_BUNDLE_PATH: "/policies"
+  POLICY_CACHE_TTL: "60s"

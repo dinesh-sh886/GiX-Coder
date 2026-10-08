@@ -1,0 +1,9 @@
+# gofumpt configuration
+# https://github.com/mvdan/gofumpt
+
+# Use strict formatting
+-f -e
+
+# Exclude generated files
+-exclude "api/proto"
+-exclude "migrations"

@@ -1,0 +1,15 @@
+go 1.25.0
+
+use (
+	.
+	./api
+	./audit
+	./gateway
+	./harness
+	./policy
+	./router
+	./sandbox
+	./shared
+	./test
+	./workflow
+)

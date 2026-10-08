@@ -11,11 +11,11 @@ assignees: []
 Brief description of the bug
 
 ### Environment
-- **OS**: [e.g., Ubuntu 22.04, macOS 14]
-- **Go Version**: [e.g., 1.22.1]
-- **Node Version**: [e.g., 20.10.0]
-- **Docker Version**: [e.g., 24.0.0]
-- **GiX-Coder Version/Commit**: [e.g., v1.0.0 or commit SHA]
+- OS: "[e.g., Ubuntu 22.04, macOS 14]"
+- Go Version: "[e.g., 1.22.1]"
+- Node Version: "[e.g., 20.10.0]"
+- Docker Version: "[e.g., 24.0.0]"
+- GiX-Coder Version/Commit: "[e.g., v1.0.0 or commit SHA]"
 
 ### Steps to Reproduce
 1. Step 1

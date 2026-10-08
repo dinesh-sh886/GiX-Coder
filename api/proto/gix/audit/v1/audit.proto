@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+package gix.audit.v1;
+
+option go_package = "github.com/gix-coder/gix-coder/api/proto/gix/audit/v1;auditv1";
+
+import "api/proto/gix/shared/v1/common.proto";
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+service AuditService {
+  rpc LogEvent(LogEventRequest) returns (LogEventResponse) {
+    option (google.api.http) = {
+      post: "/audit/events"
+      body: "*"
+    };
+  }
+  
+  rpc QueryEvents(QueryEventsRequest) returns (QueryEventsResponse) {
+    option (google.api.http) = {
+      get: "/audit/events"
+    };
+  }
+  
+  rpc VerifyIntegrity(VerifyIntegrityRequest) returns (VerifyIntegrityResponse) {
+    option (google.api.http) = {
+      post: "/audit/verify"
+      body: "*"
+    };
+  }
+  
+  rpc HealthLive(HealthLiveRequest) returns (HealthLiveResponse) {
+    option (google.api.http) = {
+      get: "/health/live"
+    };
+  }
+  rpc HealthReady(HealthReadyRequest) returns (HealthReadyResponse) {
+    option (google.api.http) = {
+      get: "/health/ready"
+    };
+  }
+}
+
+message LogEventRequest {
+  AuditEvent event = 1;
+}
+
+message LogEventResponse {
+  string event_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  bool accepted = 2;
+}
+
+message QueryEventsRequest {
+  int64 start_time = 1 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  int64 end_time = 2 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  string tenant_id = 3 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string event_type = 4 [
+    (buf.validate.field).string.max_len = 64
+  ];
+  string actor_id = 5 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string resource_type = 6 [
+    (buf.validate.field).string.max_len = 64
+  ];
+  string resource_id = 7 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string outcome = 8 [
+    (buf.validate.field).string.max_len = 32
+  ];
+  gix.shared.v1.PaginationRequest pagination = 9;
+}
+
+message QueryEventsResponse {
+  repeated AuditEvent events = 1;
+  gix.shared.v1.PaginationResponse pagination = 2;
+}
+
+message VerifyIntegrityRequest {
+  string start_event_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string end_event_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message VerifyIntegrityResponse {
+  bool valid = 1;
+  string error = 2 [
+    (buf.validate.field).string.max_len = 512
+  ];
+  int64 checked_events = 3 [
+    (buf.validate.field).int64.gte = 0
+  ];
+}
+
+message AuditEvent {
+  string event_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  int64 timestamp = 2 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  string event_type = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  Actor actor = 4;
+  Resource resource = 5;
+  string action = 6 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  string outcome = 7 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  map<string, string> details = 8;
+  SecurityContext security_context = 9;
+  Integrity integrity = 10;
+}
+
+message Actor {
+  string type = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  string id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string tenant_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message Resource {
+  string type = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  string id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string tenant_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message SecurityContext {
+  string source_ip = 1 [
+    (buf.validate.field).string.max_len = 64
+  ];
+  string user_agent = 2 [
+    (buf.validate.field).string.max_len = 512
+  ];
+  repeated string permissions = 3;
+}
+
+message Integrity {
+  string prev_hash = 1 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string hash = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message HealthLiveRequest {}
+
+message HealthLiveResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+}
+
+message HealthReadyRequest {}
+
+message HealthReadyResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  repeated gix.shared.v1.HealthCheck checks = 2;
+}

@@ -2,20 +2,22 @@
 
 ## Supported Versions
 
-| Version | Supported |
-|---------|-----------|
-| Main branch (latest) | ✓ |
-| Stage branch (RC) | ✓ |
-| Develop branch | ✓ (best effort) |
+| Version              | Supported       |
+| -------------------- | --------------- |
+| Main branch (latest) | ✓               |
+| Stage branch (RC)    | ✓               |
+| Develop branch       | ✓ (best effort) |
 
 ## Reporting a Vulnerability
 
 ### Do NOT
+
 - Open public GitHub issues for security vulnerabilities
 - Discuss vulnerabilities in public forums
 - Exploit vulnerabilities to demonstrate impact
 
 ### DO
+
 Report via **private channels**:
 
 1. **GitHub Security Advisories** (preferred)
@@ -31,6 +33,7 @@ Report via **private channels**:
    - Signal: on request
 
 ### What to Include
+
 - Vulnerability type (e.g., RCE, injection, auth bypass)
 - Affected components
 - Reproduction steps (minimal)
@@ -41,11 +44,11 @@ Report via **private channels**:
 ## Response Timeline
 
 | Severity | Acknowledgment | Assessment | Fix Target |
-|----------|----------------|------------|------------|
-| Critical | 4 hours | 24 hours | 72 hours |
-| High | 8 hours | 48 hours | 7 days |
-| Medium | 24 hours | 1 week | 30 days |
-| Low | 48 hours | 2 weeks | 90 days |
+| -------- | -------------- | ---------- | ---------- |
+| Critical | 4 hours        | 24 hours   | 72 hours   |
+| High     | 8 hours        | 48 hours   | 7 days     |
+| Medium   | 24 hours       | 1 week     | 30 days    |
+| Low      | 48 hours       | 2 weeks    | 90 days    |
 
 ## Disclosure Process
 
@@ -60,6 +63,7 @@ Report via **private channels**:
 ## Bug Bounty
 
 ### Scope
+
 - Production API endpoints
 - Sandbox escape
 - Authentication/authorization bypass
@@ -67,6 +71,7 @@ Report via **private channels**:
 - RCE in control plane
 
 ### Out of Scope
+
 - Denial of service (volumetric)
 - Social engineering
 - Physical attacks
@@ -74,14 +79,16 @@ Report via **private channels**:
 - Non-production environments
 
 ### Rewards (Indicative)
-| Severity | Reward |
-|----------|--------|
+
+| Severity | Reward   |
+| -------- | -------- |
 | Critical | $10,000+ |
-| High | $5,000 |
-| Medium | $1,000 |
-| Low | $250 |
+| High     | $5,000   |
+| Medium   | $1,000   |
+| Low      | $250     |
 
 ### Rules
+
 - First reporter gets reward
 - No automated scanning without permission
 - No testing on production data
@@ -90,6 +97,7 @@ Report via **private channels**:
 ## Security Architecture
 
 ### Key Controls
+
 - Control plane / data plane separation
 - Capability-based sandbox (gVisor/Firecracker)
 - Zero-trust networking (mTLS, egress allowlist)
@@ -98,9 +106,11 @@ Report via **private channels**:
 - Supply chain security (SLSA, sigstore)
 
 ### Threat Model
-See [Threat Model](docs/security/threat-model.md)
+
+The threat model is documented in the Security Baseline (`docs/security/baseline.md`, "Attack Vectors & Mitigations" section). A standalone threat model document is planned for Phase 01+ (`docs/security/threat-model.md` — not yet created).
 
 ### Compliance Targets
+
 - SOC 2 Type II
 - ISO 27001
 - NIST CSF
@@ -108,6 +118,7 @@ See [Threat Model](docs/security/threat-model.md)
 ## Secure Development
 
 ### Requirements
+
 - All code reviewed (security focus)
 - SAST on every PR (CodeQL)
 - SCA on every PR (govulncheck, osv-scanner)
@@ -116,6 +127,7 @@ See [Threat Model](docs/security/threat-model.md)
 - DAST on STAGE deploy
 
 ### Training
+
 - Secure coding (annual)
 - Threat modeling (architects)
 - Incident response (on-call)

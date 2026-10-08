@@ -1,0 +1,233 @@
+syntax = "proto3";
+
+package gix.shared.v1;
+
+option go_package = "github.com/gix-coder/gix-coder/api/proto/gix/shared/v1;sharedv1";
+
+import "google/protobuf/any.proto";
+import "buf/validate/validate.proto";
+
+// CapabilityType represents a capability type
+enum CapabilityType {
+  CAPABILITY_TYPE_UNSPECIFIED = 0;
+  CAPABILITY_TYPE_FILESYSTEM_READ = 1;
+  CAPABILITY_TYPE_FILESYSTEM_WRITE = 2;
+  CAPABILITY_TYPE_FILESYSTEM_LIST = 3;
+  CAPABILITY_TYPE_SHELL_EXECUTE = 4;
+  CAPABILITY_TYPE_GIT_READ = 5;
+  CAPABILITY_TYPE_GIT_WRITE = 6;
+  CAPABILITY_TYPE_TEST_EXECUTE = 7;
+  CAPABILITY_TYPE_NETWORK_EGRESS = 8;
+  CAPABILITY_TYPE_MCP_INVOKE = 9;
+}
+
+// CapabilityGrant represents a capability grant
+message CapabilityGrant {
+  string grant_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string execution_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  CapabilityType capability_type = 3 [
+    (buf.validate.field).enum.defined_only = true
+  ];
+  string resource_scope = 4 [
+    (buf.validate.field).string.max_len = 512
+  ];
+  map<string, string> constraints = 5;
+  int64 issued_at = 6 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  int64 expires_at = 7 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  string policy_version = 8 [
+    (buf.validate.field).string.max_len = 64
+  ];
+  string audit_context = 9 [
+    (buf.validate.field).string.max_len = 256
+  ];
+}
+
+// CapabilityGrantRequest represents a capability grant request
+message CapabilityGrantRequest {
+  CapabilityType capability_type = 1 [
+    (buf.validate.field).enum.defined_only = true
+  ];
+  string resource_scope = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+  map<string, string> constraints = 3;
+  int64 ttl_seconds = 4 [
+    (buf.validate.field).int64.gt = 0,
+    (buf.validate.field).int64.lte = 86400
+  ];
+}
+
+// Identity represents an authenticated identity
+message Identity {
+  string subject = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 256
+  ];
+  string tenant_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  repeated string scopes = 3 [
+    (buf.validate.field).repeated.max_items = 64
+  ];
+  int64 expires_at = 4 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  int64 issued_at = 5 [
+    (buf.validate.field).int64.gt = 0
+  ];
+  string issuer = 9 [
+    (buf.validate.field).string.max_len = 256
+  ];
+  string audience = 10 [
+    (buf.validate.field).string.max_len = 256
+  ];
+}
+
+// RequestContext holds request context for routing and policy
+message RequestContext {
+  string correlation_id = 1 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string trace_id = 2 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string span_id = 3 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string tenant_id = 4 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string user_id = 5 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string workflow_id = 6 [
+    (buf.validate.field).string.max_len = 128
+  ];
+  string workflow_type = 7 [
+    (buf.validate.field).string.max_len = 64
+  ];
+}
+
+// ResourceScope represents a resource scope
+message ResourceScope {
+  string type = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  string value = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+// ResourceUsage represents resource usage metrics
+message ResourceUsage {
+  int64 cpu_ms = 1 [
+    (buf.validate.field).int64.gte = 0
+  ];
+  int64 memory_bytes = 2 [
+    (buf.validate.field).int64.gte = 0
+  ];
+  int64 io_bytes = 3 [
+    (buf.validate.field).int64.gte = 0
+  ];
+}
+
+// PaginationRequest represents pagination parameters
+message PaginationRequest {
+  int32 page = 1 [
+    (buf.validate.field).int32.gte = 1
+  ];
+  int32 page_size = 2 [
+    (buf.validate.field).int32.gte = 1,
+    (buf.validate.field).int32.lte = 100
+  ];
+}
+
+// PaginationResponse represents pagination metadata
+message PaginationResponse {
+  int32 page = 1 [
+    (buf.validate.field).int32.gte = 1
+  ];
+  int32 page_size = 2 [
+    (buf.validate.field).int32.gte = 1
+  ];
+  int32 total = 3 [
+    (buf.validate.field).int32.gte = 0
+  ];
+  int32 total_pages = 4 [
+    (buf.validate.field).int32.gte = 0
+  ];
+}
+
+// ErrorDetail represents error details
+message ErrorDetail {
+  string code = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  string message = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+  map<string, string> details = 3;
+  string correlation_id = 4 [
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+// HealthCheck represents a health check
+message HealthCheck {
+  string name = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  string status = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  int64 latency_ms = 3 [
+    (buf.validate.field).int64.gte = 0
+  ];
+  map<string, string> details = 4;
+  string error = 5 [
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+// HealthResponse represents a health check response
+message HealthResponse {
+  string status = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 32
+  ];
+  repeated HealthCheck checks = 2;
+  string version = 3 [
+    (buf.validate.field).string.max_len = 64
+  ];
+  int64 timestamp = 4 [
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+// ErrorResponse represents an API error response
+message ErrorResponse {
+  ErrorDetail error = 1;
+}
+
+// SuccessResponse represents a successful API response
+message SuccessResponse {
+  google.protobuf.Any data = 1;
+}
